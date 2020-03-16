@@ -22,45 +22,24 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkan.h"
+/* Raw Rendering Engine - "src/rawMemory.h"
  *
- * Vulkan runtime function loading
+ * Cross-platform memory allocation API
+ *
+ * TODO: Implement custom memory allocators
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
  * Last modified: 16/03/2020
  */
 
-#ifndef RAW_VULKAN_H
-#define RAW_VULKAN_H
+#ifndef RAW_MEMORY_H
+#define RAW_MEMORY_H
 
-#include <src/platform/rawOS.h>
+#include <stdint.h>
 
-#include <vulkan/vulkan.h>
+void* rawMemAlloc(uint64_t size);
+void rawMemFree(void* ptr);
 
-#include <stdbool.h>
-
-#define vkGetInstanceProcAddr \
-	rawVkGetInstanceProcAddr
-extern PFN_vkGetInstanceProcAddr
-	vkGetInstanceProcAddr;
-
-#define vkEnumerateInstanceExtensionProperties \
-	rawVkEnumerateInstanceExtensionProperties
-extern PFN_vkEnumerateInstanceExtensionProperties
-	vkEnumerateInstanceExtensionProperties;
-
-#define vkEnumerateInstanceLayerProperties \
-	rawVkEnumerateInstanceLayerProperties
-extern PFN_vkEnumerateInstanceLayerProperties
-	vkEnumerateInstanceLayerProperties;
-
-#define vkCreateInstance \
-	rawVkCreateInstance
-extern PFN_vkCreateInstance
-	vkCreateInstance;
-
-bool loadVulkan(VULKAN_LIBRARY vulkan);
-
-#endif // RAW_VULKAN_H
+#endif // RAW_MEMORY_H
 

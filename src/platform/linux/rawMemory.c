@@ -22,45 +22,26 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkan.h"
+/* Raw Rendering Engine - "src/platform/linux/rawMemory.c"
  *
- * Vulkan runtime function loading
+ * Linux implementation for the memory allocation API
+ *
+ * TODO: Implement custom memory allocators
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
  * Last modified: 16/03/2020
  */
 
-#ifndef RAW_VULKAN_H
-#define RAW_VULKAN_H
+#include <src/rawMemory.h>
 
-#include <src/platform/rawOS.h>
+#include <stdlib.h>
 
-#include <vulkan/vulkan.h>
+void* rawMemAlloc(uint64_t size) {
+	return malloc(size);
+}
 
-#include <stdbool.h>
-
-#define vkGetInstanceProcAddr \
-	rawVkGetInstanceProcAddr
-extern PFN_vkGetInstanceProcAddr
-	vkGetInstanceProcAddr;
-
-#define vkEnumerateInstanceExtensionProperties \
-	rawVkEnumerateInstanceExtensionProperties
-extern PFN_vkEnumerateInstanceExtensionProperties
-	vkEnumerateInstanceExtensionProperties;
-
-#define vkEnumerateInstanceLayerProperties \
-	rawVkEnumerateInstanceLayerProperties
-extern PFN_vkEnumerateInstanceLayerProperties
-	vkEnumerateInstanceLayerProperties;
-
-#define vkCreateInstance \
-	rawVkCreateInstance
-extern PFN_vkCreateInstance
-	vkCreateInstance;
-
-bool loadVulkan(VULKAN_LIBRARY vulkan);
-
-#endif // RAW_VULKAN_H
+void rawMemFree(void* ptr) {
+	free(ptr);
+}
 

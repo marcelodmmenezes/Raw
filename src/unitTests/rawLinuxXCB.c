@@ -22,45 +22,42 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkan.h"
+/* Raw Rendering Engine - "src/unitTests/rawLinuxXCB.c"
  *
- * Vulkan runtime function loading
+ * Unit testing procedures
+ * Linux, XCB
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
  * Last modified: 16/03/2020
  */
 
-#ifndef RAW_VULKAN_H
-#define RAW_VULKAN_H
+#include <src/rawMemory.h>
+#include <src/vulkan/rawVulkan.h>
 
-#include <src/platform/rawOS.h>
+#include <assert.h>
+#include <stdio.h>
 
-#include <vulkan/vulkan.h>
+void testMemoryAllocation() {
+	puts("Running memory allocation test...");
 
-#include <stdbool.h>
+	void* ptr = rawMemAlloc(4294967296);
+	assert(ptr && "rawMemAlloc failed!");
 
-#define vkGetInstanceProcAddr \
-	rawVkGetInstanceProcAddr
-extern PFN_vkGetInstanceProcAddr
-	vkGetInstanceProcAddr;
+	rawMemFree(ptr);
+	ptr = RAW_NULL_PTR;
+}
 
-#define vkEnumerateInstanceExtensionProperties \
-	rawVkEnumerateInstanceExtensionProperties
-extern PFN_vkEnumerateInstanceExtensionProperties
-	vkEnumerateInstanceExtensionProperties;
+void testVulkanLibraryLoading() {
+	puts("Running vulkan library loading test...");
 
-#define vkEnumerateInstanceLayerProperties \
-	rawVkEnumerateInstanceLayerProperties
-extern PFN_vkEnumerateInstanceLayerProperties
-	vkEnumerateInstanceLayerProperties;
+	VULKAN_LIBRARY vulkan;
+	assert(loadVulkan(vulkan) && "loadVulkan failed!");
+}
 
-#define vkCreateInstance \
-	rawVkCreateInstance
-extern PFN_vkCreateInstance
-	vkCreateInstance;
-
-bool loadVulkan(VULKAN_LIBRARY vulkan);
-
-#endif // RAW_VULKAN_H
+int main() {
+	testMemoryAllocation();
+	testVulkanLibraryLoading();
+	puts("All tests succeeded!");
+}
 

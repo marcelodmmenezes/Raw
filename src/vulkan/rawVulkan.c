@@ -22,17 +22,31 @@
  * SOFTWARE.
  */
 
+/* Raw Rendering Engine - "src/vulkan/rawVulkan.c"
+ *
+ * Vulkan runtime function loading
+ *
+ * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
+ * Created: 16/03/2020
+ * Last modified: 16/03/2020
+ */
+
 #include <src/vulkan/rawVulkan.h>
 
 // TODO: Implement log library
 #include <stdio.h>
 
-PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
+PFN_vkGetInstanceProcAddr
+	vkGetInstanceProcAddr;
+PFN_vkEnumerateInstanceExtensionProperties
+	vkEnumerateInstanceExtensionProperties;
+PFN_vkEnumerateInstanceLayerProperties
+	vkEnumerateInstanceLayerProperties;
+PFN_vkCreateInstance
+	vkCreateInstance;
 
 bool loadVulkan(VULKAN_LIBRARY vulkan) {
-#if defined (RAW_PLATFORM_LINUX)
-	vulkan = dlopen("libvulkan.so.1", RTLD_NOW);
-#endif
+	RAW_LOAD_VULKAN_LIBRARY(vulkan);
 
 	if (!vulkan) {
 		puts("ERROR: Vulkan Runtime library connection failed!");
@@ -40,9 +54,7 @@ bool loadVulkan(VULKAN_LIBRARY vulkan) {
 	}
 
 	vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)
-#if defined (RAW_PLATFORM_LINUX)
-		dlsym(vulkan, "vkGetInstanceProcAddr");
-#endif
+		RAW_LOAD_LIBRARY_FUNCTION(vulkan, "vkGetInstanceProcAddr");
 
 	if (!vkGetInstanceProcAddr) {
 		puts("ERROR: vkGetInstanceProcAddr could not be loaded!");

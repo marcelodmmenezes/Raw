@@ -22,16 +22,50 @@
  * SOFTWARE.
  */
 
-#include <src/vulkan/rawVulkan.h>
+/* Raw Rendering Engine - "src/platform/rawOS.h"
+ *
+ * Operating system abstraction API
+ *
+ * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
+ * Created: 16/03/2020
+ * Last modified: 16/03/2020
+ */
 
-#include <assert.h>
+#ifndef RAW_OS_H
+#define RAW_OS_H
 
-void testVulkanLibraryLoading() {
-	VULKAN_LIBRARY vulkan;
-	assert(loadVulkan(vulkan) && "testVulkanLibraryLoading failed!");
-}
+///----------------------------------------------------------------------- LINUX
+#if defined (RAW_PLATFORM_LINUX)
 
-int main() {
-	testVulkanLibraryLoading();
-}
+#include <dlfcn.h>
+
+#define VULKAN_LIBRARY void*
+
+#define RAW_LOAD_VULKAN_LIBRARY(library) \
+	library = dlopen("libvulkan.so.1", RTLD_NOW)
+
+#define RAW_LOAD_LIBRARY_FUNCTION(library, fn_name) dlsym(library, fn_name)
+
+#if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
+#define VK_USE_PLATFORM_XCB_KHR
+#elif defined (RAW_PLATFORM_XLIB_WINDOW_SYSTEM)
+#define VK_USE_PLATFORM_XLIB_KHR
+#endif
+
+///--------------------------------------------------------------------- WINDOWS
+#elif defined (RAW_PLATFORM_WINDOWS)
+
+#if !defined (WIN32_LEAN_AND_MEAN)
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+
+// TODO: RAW_LOAD_VULKAN_LIBRARY, RAW_LOAD_LIBRARY_FUNCTION
+
+#define VULKAN_LIBRARY HMODULE
+#define VK_USE_PLATFORM_WIN32_KHR
+
+#endif // Operating system switch
+
+#endif // RAW_OS_H
 

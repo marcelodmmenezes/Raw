@@ -21,9 +21,12 @@
 ## SOFTWARE.
 
 unitTestsXCB:
-	gcc src/unitTests/main.c src/vulkan/rawVulkan.c \
-	-o build/unitTests/unitTestsXCB.out \
-	-I . \
+	gcc -std=c11                                            \
+	src/unitTests/rawLinuxXCB.c src/vulkan/rawVulkan.c      \
+	src/platform/linux/rawMemory.c                          \
+	-o build/unitTests/unitTestsXCB.out                     \
+	-I .                                                    \
 	-D RAW_PLATFORM_LINUX -D RAW_PLATFORM_XCB_WINDOW_SYSTEM \
+	-D RAW_NULL_PTR="(void*)0"                              \
 	-ldl
 
