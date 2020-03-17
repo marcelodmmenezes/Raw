@@ -20,13 +20,27 @@
 ## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ## SOFTWARE.
 
+## Raw Rendering Engine - "Makefile"
+##
+## Basic Makefile for testing
+## TODO: Reduce compilation time
+##
+## Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
+## Created: 16/03/2020
+## Last modified: 16/03/2020
+
 unitTestsXCB:
 	gcc -std=c11                                            \
-	src/unitTests/rawLinuxXCB.c src/vulkan/rawVulkan.c      \
+	src/unitTests/rawLinuxXCB.c                             \
+	src/vulkan/rawVulkan.c                                  \
+	src/vulkan/rawVulkanInstance.c                          \
 	src/platform/linux/rawMemory.c                          \
 	-o build/unitTests/unitTestsXCB.out                     \
 	-I .                                                    \
 	-D RAW_PLATFORM_LINUX -D RAW_PLATFORM_XCB_WINDOW_SYSTEM \
 	-D RAW_NULL_PTR="(void*)0"                              \
+	-D RAW_ENGINE_NAME="\"RAW Rendering Engine\""           \
+	-D RAW_ENGINE_VERSION="VK_MAKE_VERSION(1, 0, 0)"        \
+	-D RAW_VULKAN_VERSION="VK_MAKE_VERSION(1, 0, 0)"        \
 	-ldl
 

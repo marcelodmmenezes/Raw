@@ -39,12 +39,12 @@
 
 #include <dlfcn.h>
 
-#define VULKAN_LIBRARY void*
+#define RAW_VULKAN_LIBRARY void*
 
 #define RAW_LOAD_VULKAN_LIBRARY(library) \
 	library = dlopen("libvulkan.so.1", RTLD_NOW)
 
-#define RAW_LOAD_LIBRARY_FUNCTION(library, fn_name) dlsym(library, fn_name)
+#define RAW_LOAD_LIBRARY_FUNCTION(library, function) dlsym(library, function)
 
 #if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
 #define VK_USE_PLATFORM_XCB_KHR
@@ -62,7 +62,7 @@
 
 // TODO: RAW_LOAD_VULKAN_LIBRARY, RAW_LOAD_LIBRARY_FUNCTION
 
-#define VULKAN_LIBRARY HMODULE
+#define RAW_VULKAN_LIBRARY HMODULE
 #define VK_USE_PLATFORM_WIN32_KHR
 
 #endif // Operating system switch

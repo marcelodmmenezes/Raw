@@ -22,49 +22,46 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkan.h"
+/* Raw Rendering Engine - "src/vulkan/rawVulkanInstance.h"
  *
- * Vulkan runtime function loading
+ * Vulkan instance related functions
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
  * Last modified: 16/03/2020
  */
 
-#ifndef RAW_VULKAN_H
-#define RAW_VULKAN_H
+#ifndef RAW_VULKAN_INSTANCE_H
+#define RAW_VULKAN_INSTANCE_H
 
-#include <src/platform/rawOS.h>
-
-#include <vulkan/vulkan.h>
+#include <src/vulkan/rawVulkan.h>
 
 #include <stdbool.h>
-
-#define vkGetInstanceProcAddr \
-	rawVkGetInstanceProcAddr
-extern PFN_vkGetInstanceProcAddr
-	vkGetInstanceProcAddr;
-
-#define vkEnumerateInstanceExtensionProperties \
-	rawVkEnumerateInstanceExtensionProperties
-extern PFN_vkEnumerateInstanceExtensionProperties
-	vkEnumerateInstanceExtensionProperties;
-
-#define vkEnumerateInstanceLayerProperties \
-	rawVkEnumerateInstanceLayerProperties
-extern PFN_vkEnumerateInstanceLayerProperties
-	vkEnumerateInstanceLayerProperties;
-
-#define vkCreateInstance \
-	rawVkCreateInstance
-extern PFN_vkCreateInstance
-	vkCreateInstance;
+#include <stdint.h>
 
 /*
- * Loads Vulkan runtime library, vkGetInstanceProcAddr
- * and Vulkan global level functions.
+ * If sucessfull, the function will allocate memory
+ * for @available_extensions. It's the caller's
+ * responsibility to free that memory.
  */
-bool rawLoadVulkan(RAW_VULKAN_LIBRARY vulkan);
+bool rawEnumerateAvailableVulkanExtensions(
+	VkExtensionProperties* available_extensions,
+	uint32_t* n_extensions);
 
-#endif // RAW_VULKAN_H
+/*
+ * Creates the Vulkan instance only if all
+ * desired_extensions are available.
+ */
+bool rawCreateVulkanInstance(
+	VkInstance* instance,
+	VkExtensionProperties* const available_extensions,
+	uint32_t n_available_extensions,
+	char const* const* desired_extensions,
+	uint32_t n_desired_extensions,
+	char const* const application_name,
+	uint32_t application_version);
+
+void rawDestroyVulkanInstance(VkInstance* instance);
+
+#endif // RAW_VULKAN_INSTANCE_H
 

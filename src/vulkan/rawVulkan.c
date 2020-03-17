@@ -45,7 +45,7 @@ PFN_vkEnumerateInstanceLayerProperties
 PFN_vkCreateInstance
 	vkCreateInstance;
 
-bool loadVulkan(VULKAN_LIBRARY vulkan) {
+bool rawLoadVulkan(RAW_VULKAN_LIBRARY vulkan) {
 	RAW_LOAD_VULKAN_LIBRARY(vulkan);
 
 	if (!vulkan) {
@@ -60,6 +60,19 @@ bool loadVulkan(VULKAN_LIBRARY vulkan) {
 		puts("ERROR: vkGetInstanceProcAddr could not be loaded!");
 		return false;
 	}
+
+#define LOAD(func)                                                 \
+	func = (PFN_##func)vkGetInstanceProcAddr(RAW_NULL_PTR, #func); \
+	                                                               \
+	if (!func) {                                                   \
+		puts("ERROR: " #func " could not be loaded!");             \
+		return false;                                              \
+	}
+
+	LOAD(vkEnumerateInstanceExtensionProperties);
+	LOAD(vkEnumerateInstanceLayerProperties);
+	LOAD(vkCreateInstance);
+#undef LOAD
 
 	return true;
 }
