@@ -34,7 +34,7 @@
 #ifndef RAW_VULKAN_H
 #define RAW_VULKAN_H
 
-#include <engine/platform/rawOS.h>
+#include <engine/platform/rawPlatform.h>
 
 #include <vulkan/vulkan.h>
 

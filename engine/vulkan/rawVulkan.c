@@ -39,9 +39,8 @@
  */
 
 #include <engine/vulkan/rawVulkan.h>
+#include <engine/utils/rawLog.h>
 
-// TODO: Implement log library
-#include <stdio.h>
 #include <string.h>
 
 /*
@@ -106,7 +105,8 @@ bool rawLoadVulkan(RAW_VULKAN_LIBRARY vulkan) {
 	RAW_LOAD_VULKAN_LIBRARY(vulkan);
 
 	if (!vulkan) {
-		puts("ERROR: Vulkan Runtime library connection failed!");
+		RAW_LOG_ERROR("Vulkan runtime library connection failed!");
+
 		return false;
 	}
 
@@ -114,7 +114,8 @@ bool rawLoadVulkan(RAW_VULKAN_LIBRARY vulkan) {
 		RAW_LOAD_LIBRARY_FUNCTION(vulkan, "vkGetInstanceProcAddr");
 
 	if (!vkGetInstanceProcAddr) {
-		puts("ERROR: vkGetInstanceProcAddr could not be loaded!");
+		RAW_LOG_ERROR("vkGetInstanceProcAddr could not be loaded!");
+
 		return false;
 	}
 
@@ -122,7 +123,8 @@ bool rawLoadVulkan(RAW_VULKAN_LIBRARY vulkan) {
 	func = (PFN_##func)vkGetInstanceProcAddr(RAW_NULL_PTR, #func); \
 	                                                               \
 	if (!func) {                                                   \
-		puts("ERROR: " #func " could not be loaded!");             \
+		RAW_LOG_ERROR(#func " could not be loaded!");              \
+                                                                   \
 		return false;                                              \
 	}
 
@@ -143,7 +145,8 @@ bool rawLoadVulkanInstanceLevelFunctions(
 	func = (PFN_##func)vkGetInstanceProcAddr(instance, #func); \
                                                                \
 	if (!func) {                                               \
-		puts("ERROR: " #func " could not be loaded!");         \
+		RAW_LOG_ERROR(#func " could not be loaded!");          \
+                                                               \
 		return false;                                          \
 	}
 
@@ -165,7 +168,8 @@ bool rawLoadVulkanInstanceLevelFunctions(
 			func = (PFN_##func)vkGetInstanceProcAddr(instance, #func); \
                                                                        \
 			if (!func) {                                               \
-				puts("ERROR: " #func " could not be loaded!");         \
+				RAW_LOG_ERROR(#func " could not be loaded!");          \
+                                                                       \
 				return false;                                          \
 			}                                                          \
 		}                                                              \

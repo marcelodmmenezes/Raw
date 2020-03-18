@@ -22,50 +22,72 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "engine/platform/rawOS.h"
+/* Raw Rendering Engine - "engine/platform/rawPlatform.c"
  *
  * Operating system abstraction API
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 16/03/2020
+ * Created: 18/03/2020
  * Last modified: 18/03/2020
  */
 
-#ifndef RAW_OS_H
-#define RAW_OS_H
+#include <engine/platform/rawPlatform.h>
 
 ///----------------------------------------------------------------------- LINUX
-#if defined (RAW_PLATFORM_LINUX)
+#include <stdio.h>
 
-#include <dlfcn.h>
+void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color) {
+	switch (color) {
+		case RAW_PLATFORM_TERMINAL_COLOR_RED:
+			printf("\033[0;31m");
+			break;
 
-#define RAW_VULKAN_LIBRARY void*
+		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_RED:
+			printf("\033[1;31m");
+			break;
 
-#define RAW_LOAD_VULKAN_LIBRARY(library) \
-	library = dlopen("libvulkan.so.1", RTLD_NOW)
+		case RAW_PLATFORM_TERMINAL_COLOR_GREEN:
+			printf("\033[0;32m");
+			break;
 
-#define RAW_LOAD_LIBRARY_FUNCTION(library, function) dlsym(library, function)
+		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_GREEN:
+			printf("\033[1;32m");
+			break;
 
-#if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
-#define VK_USE_PLATFORM_XCB_KHR
-#elif defined (RAW_PLATFORM_XLIB_WINDOW_SYSTEM)
-#define VK_USE_PLATFORM_XLIB_KHR
-#endif
+		case RAW_PLATFORM_TERMINAL_COLOR_YELLOW:
+			printf("\033[0;33m");
+			break;
 
-///--------------------------------------------------------------------- WINDOWS
-#elif defined (RAW_PLATFORM_WINDOWS)
+		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_YELLOW:
+			printf("\033[1;33m");
+			break;
 
-#if !defined (WIN32_LEAN_AND_MEAN)
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+		case RAW_PLATFORM_TERMINAL_COLOR_BLUE:
+			printf("\033[0;34m");
+			break;
 
-// TODO: RAW_LOAD_VULKAN_LIBRARY, RAW_LOAD_LIBRARY_FUNCTION
+		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_BLUE:
+			printf("\033[1;34m");
+			break;
 
-#define RAW_VULKAN_LIBRARY HMODULE
-#define VK_USE_PLATFORM_WIN32_KHR
+		case RAW_PLATFORM_TERMINAL_COLOR_MAGENTA:
+			printf("\033[0;35m");
+			break;
 
-#endif // Operating system switch
+		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_MAGENTA:
+			printf("\033[1;35m");
+			break;
 
-#endif // RAW_OS_H
+		case RAW_PLATFORM_TERMINAL_COLOR_CYAN:
+			printf("\033[0;36m");
+			break;
+
+		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_CYAN:
+			printf("\033[1;36m");
+			break;
+
+		default:
+			printf("\033[0m");
+	}
+}
 

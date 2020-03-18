@@ -36,39 +36,48 @@
 #include <engine/vulkan/rawVulkan.h>
 #include <engine/vulkan/rawVulkanInstance.h>
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
+#include <engine/utils/rawLog.h>
 
 #include <assert.h>
-#include <stdio.h>
+
+// Not exactly a unit test but useful anyways
+void testLoggingLibrary() {
+	RAW_LOG_CMSG("Running logging test...\n", RAW_LOG_BLUE);
+
+	RAW_LOG_MSG("RAW_LOG_MSG\n");
+	RAW_LOG_CMSG("RAW_LOG_CMSG\n", RAW_LOG_CYAN);
+	RAW_LOG_TRACE("RAW_LOG_TRACE %d\n", 1);
+	RAW_LOG_INFO("RAW_LOG_INFO %d\n", 2);
+	RAW_LOG_WARNING("RAW_LOG_WARNING %d\n", 3);
+	RAW_LOG_ERROR("RAW_LOG_ERROR %d\n", 4);
+
+	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+}
 
 void testMemoryAllocation() {
-	puts("\033[0;34mRunning memory allocation test...\033[0m");
-	fflush(stdout);
+	RAW_LOG_CMSG("Running memory allocation test...\n", RAW_LOG_BLUE);
 
 	void* ptr;
-	RAW_MEM_ALLOC(ptr, 4294967296, __FILE__, __LINE__);
+	RAW_MEM_ALLOC(ptr, 4294967296);
 	assert(ptr && "RAW_MEM_ALLOC failed!");
 
-	RAW_MEM_FREE(ptr, __FILE__, __LINE__);
+	RAW_MEM_FREE(ptr);
 	ptr = RAW_NULL_PTR;
 
-	puts("\033[0;32mTest succeeded\n\033[0m");
-	fflush(stdout);
+	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
 
 void testVulkanLibraryLoading() {
-	puts("\033[0;34mRunning Vulkan library loading test...\033[0m");
-	fflush(stdout);
+	RAW_LOG_CMSG("Running Vulkan library loading test...\n", RAW_LOG_BLUE);
 
 	RAW_VULKAN_LIBRARY vulkan;
 	assert(rawLoadVulkan(vulkan) && "loadVulkan failed!");
 
-	puts("\033[0;32mTest succeeded\n\033[0m");
-	fflush(stdout);
+	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
 
 void testVulkanInstanceCreationAndDestruction() {
-	puts("\033[0;34mRunning Vulkan instance creation test...\033[0m");
-	fflush(stdout);
+	RAW_LOG_CMSG("Running Vulkan instance creation test...\n", RAW_LOG_BLUE);
 
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
@@ -96,16 +105,15 @@ void testVulkanInstanceCreationAndDestruction() {
 	assert(instance == VK_NULL_HANDLE &&
 		"Vulkan instance destruction failed!");
 
-	RAW_MEM_FREE(available_extensions, __FILE__, __LINE__);
+	RAW_MEM_FREE(available_extensions);
 	available_extensions = RAW_NULL_PTR;
 
-	puts("\033[0;32mTest succeeded\n\033[0m");
-	fflush(stdout);
+	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
 
 void testVulkanPhysicalDeviceCreationAndDestruction() {
-	puts("\033[0;34mRunning Vulkan physical device creation test...\033[0m");
-	fflush(stdout);
+	RAW_LOG_CMSG("Running Vulkan physical device "
+		"creation test...\n", RAW_LOG_BLUE);
 
 	// Instance creation
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
@@ -157,33 +165,33 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 			n_queue_families, 0, &queue_family_index) &&
 			"rawGetPhysicalDeviceQueueFamily failed!");
 
-		RAW_MEM_FREE(queue_families, __FILE__, __LINE__);
+		RAW_MEM_FREE(queue_families);
 		queue_families = RAW_NULL_PTR;
 
-		RAW_MEM_FREE(device_extensions, __FILE__, __LINE__);
+		RAW_MEM_FREE(device_extensions);
 		device_extensions = RAW_NULL_PTR;
 	}
 
-	RAW_MEM_FREE(physical_devices, __FILE__, __LINE__);
+	RAW_MEM_FREE(physical_devices);
 	physical_devices = RAW_NULL_PTR;
 	
 	// Instance destruction
 	rawDestroyVulkanInstance(&instance);
 	instance == VK_NULL_HANDLE;
 
-	RAW_MEM_FREE(available_extensions, __FILE__, __LINE__);
+	RAW_MEM_FREE(available_extensions);
 	available_extensions = RAW_NULL_PTR;
 
-	puts("\033[0;32mTest succeeded\n\033[0m");
-	fflush(stdout);
+	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
 
 int main() {
+	testLoggingLibrary();
 	testMemoryAllocation();
 	testVulkanLibraryLoading();
 	testVulkanInstanceCreationAndDestruction();
 	testVulkanPhysicalDeviceCreationAndDestruction();
 
-	puts("\033[0;32mAll tests succeeded!\n\033[0m");
+	RAW_LOG_CMSG("All tests succeeded!\n", RAW_LOG_GREEN);
 }
 

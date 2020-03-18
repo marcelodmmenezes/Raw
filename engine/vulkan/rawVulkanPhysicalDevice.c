@@ -33,11 +33,9 @@
 
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
 #include <engine/platform/rawMemory.h>
+#include <engine/utils/rawLog.h>
 
 #include <assert.h>
-
-// TODO: Implement log library
-#include <stdio.h>
 
 bool rawGetPhysicalDevices(
 	VkInstance instance,
@@ -48,18 +46,20 @@ bool rawGetPhysicalDevices(
 		instance, n_available_devices, RAW_NULL_PTR);
 
 	if (result != VK_SUCCESS) {
-		puts("ERROR: vkEnumeratePhysicalDevices failed!");
+		RAW_LOG_ERROR("vkEnumeratePhysicalDevices failed!");
+
 		return false;
 	}
 
 	RAW_MEM_ALLOC(*available_devices,
-		*n_available_devices * sizeof(VkPhysicalDevice),
-		__FILE__, __LINE__);
+		*n_available_devices * sizeof(VkPhysicalDevice));
 
 	if (!*available_devices) {
-		RAW_MEM_FREE(*available_devices, __FILE__, __LINE__);
+		RAW_MEM_FREE(*available_devices);
 		*available_devices = RAW_NULL_PTR;
-		puts("ERROR: RAW_MEM_ALLOC failed on rawEnumeratePhysicalDevices!");
+
+		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on rawEnumeratePhysicalDevices!");
+
 		return false;
 	}
 
@@ -67,9 +67,11 @@ bool rawGetPhysicalDevices(
 		instance, n_available_devices, *available_devices);
 
 	if (result != VK_SUCCESS) {
-		RAW_MEM_FREE(*available_devices, __FILE__, __LINE__);
+		RAW_MEM_FREE(*available_devices);
 		*available_devices = RAW_NULL_PTR;
-		puts("ERROR: vkEnumeratePhysicalDevices failed!");
+
+		RAW_LOG_ERROR("vkEnumeratePhysicalDevices failed!");
+
 		return false;
 	}
 
@@ -91,18 +93,21 @@ bool rawGetPhysicalDeviceCharacteristics(
 		n_available_extensions, RAW_NULL_PTR);
 
 	if (result != VK_SUCCESS) {
-		puts("ERROR: vkEnumerateDeviceExtensionProperties failed!");
+		RAW_LOG_ERROR("vkEnumerateDeviceExtensionProperties failed!");
+
 		return false;
 	}
 
 	RAW_MEM_ALLOC(*available_extensions,
-		*n_available_extensions * sizeof(VkExtensionProperties),
-		__FILE__, __LINE__);
+		*n_available_extensions * sizeof(VkExtensionProperties));
 
 	if (!*available_extensions) {
-		RAW_MEM_FREE(*available_extensions, __FILE__, __LINE__);
+		RAW_MEM_FREE(*available_extensions);
 		*available_extensions = RAW_NULL_PTR;
-		puts("ERROR: RAW_MEM_ALLOC failed on rawGetPhysicalDeviceExtensions!");
+
+		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on "
+			"rawGetPhysicalDeviceExtensions!");
+
 		return false;
 	}
 
@@ -111,9 +116,11 @@ bool rawGetPhysicalDeviceCharacteristics(
 		n_available_extensions, *available_extensions);
 
 	if (result != VK_SUCCESS) {
-		RAW_MEM_FREE(*available_extensions, __FILE__, __LINE__);
+		RAW_MEM_FREE(*available_extensions);
 		*available_extensions = RAW_NULL_PTR;
-		puts("ERROR: vkEnumerateDeviceExtensionProperties failed!");
+
+		RAW_LOG_ERROR("vkEnumerateDeviceExtensionProperties failed!");
+
 		return false;
 	}
 
@@ -124,26 +131,30 @@ bool rawGetPhysicalDeviceCharacteristics(
 		physical_device, n_queue_families, RAW_NULL_PTR);
 
 	if (*n_queue_families == 0) {
-		RAW_MEM_FREE(available_extensions, __FILE__, __LINE__);
+		RAW_MEM_FREE(available_extensions);
 		available_extensions = RAW_NULL_PTR;
-		puts("ERROR: physical device doesn't have "
+
+		RAW_LOG_ERROR("physical device doesn't have "
 			"any queue families available!");
+
 		return false;
 	}
 
 	RAW_MEM_ALLOC(*queue_families,
-		*n_queue_families * sizeof(VkQueueFamilyProperties),
-		__FILE__, __LINE__);
+		*n_queue_families * sizeof(VkQueueFamilyProperties));
 
 	vkGetPhysicalDeviceQueueFamilyProperties(
 		physical_device, n_queue_families, *queue_families);
 
 	if (*n_queue_families == 0) {
-		RAW_MEM_FREE(available_extensions, __FILE__, __LINE__);
+		RAW_MEM_FREE(available_extensions);
 		available_extensions = RAW_NULL_PTR;
-		RAW_MEM_FREE(*queue_families, __FILE__, __LINE__);
+
+		RAW_MEM_FREE(*queue_families);
 		*queue_families = RAW_NULL_PTR;
-		puts("ERROR: physical device doesn't have "
+
+		RAW_LOG_ERROR("physical device doesn't have "
+
 			"any queue families available!");
 
 		return false;

@@ -37,9 +37,6 @@
 #include <assert.h>
 #include <string.h>
 
-// TODO: Implement log library
-#include <stdio.h>
-
 bool rawGetAvailableVulkanExtensions(
 	VkExtensionProperties** available_extensions,
 	uint32_t* n_extensions) {
@@ -48,18 +45,20 @@ bool rawGetAvailableVulkanExtensions(
 		RAW_NULL_PTR, n_extensions, RAW_NULL_PTR);
 
 	if (result != VK_SUCCESS) {
-		puts("ERROR: vkEnumerateInstanceExtensionProperties failed!");
+		RAW_LOG_ERROR("vkEnumerateInstanceExtensionProperties failed!");
+
 		return false;
 	}
 
 	RAW_MEM_ALLOC(*available_extensions,
-		*n_extensions * sizeof(VkExtensionProperties),
-		__FILE__, __LINE__);
+		*n_extensions * sizeof(VkExtensionProperties));
 
 	if (!*available_extensions) {
-		RAW_MEM_FREE(*available_extensions, __FILE__, __LINE__);
+		RAW_MEM_FREE(*available_extensions);
 		*available_extensions = RAW_NULL_PTR;
-		puts("ERROR: RAW_MEM_ALLOC failed on rawGetAvailableExtensions!");
+
+		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on rawGetAvailableExtensions!");
+
 		return false;
 	}
 
@@ -67,9 +66,11 @@ bool rawGetAvailableVulkanExtensions(
 		RAW_NULL_PTR, n_extensions, *available_extensions);
 
 	if (result != VK_SUCCESS) {
-		RAW_MEM_FREE(*available_extensions, __FILE__, __LINE__);
+		RAW_MEM_FREE(*available_extensions);
 		*available_extensions = RAW_NULL_PTR;
-		puts("ERROR: vkEnumerateInstanceExtensionProperties failed!");
+
+		RAW_LOG_ERROR("vkEnumerateInstanceExtensionProperties failed!");
+
 		return false;
 	}
 
@@ -97,7 +98,8 @@ bool rawCreateVulkanInstance(
 		}
 
 		if (!available) {
-			printf("ERROR: %s is not supported!", desired_extensions[i]);
+			RAW_LOG_ERROR("%s is not supported!", desired_extensions[i]);
+
 			return false;
 		}
 	}
@@ -129,7 +131,8 @@ bool rawCreateVulkanInstance(
 		&instance_create_info, RAW_NULL_PTR, instance);
 
 	if ((result != VK_SUCCESS) || (*instance == VK_NULL_HANDLE)) {
-		puts("ERROR: Vulkan instance creation failed!");
+		RAW_LOG_ERROR("Vulkan instance creation failed!");
+
 		return false;
 	}
 

@@ -1,3 +1,4 @@
+##
 ## MIT License
 ##
 ## Copyright (c) 2020 Marcelo de Matos Menezes
@@ -19,6 +20,7 @@
 ## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 ## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ## SOFTWARE.
+##
 
 ## Raw Rendering Engine - "Makefile"
 ##
@@ -28,6 +30,7 @@
 ## Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
 ## Created: 16/03/2020
 ## Last modified: 18/03/2020
+##
 
 unitTestsXCB:
 	gcc -std=c11                                            \
@@ -35,6 +38,7 @@ unitTestsXCB:
 	engine/vulkan/rawVulkan.c                               \
 	engine/vulkan/rawVulkanInstance.c                       \
 	engine/vulkan/rawVulkanPhysicalDevice.c                 \
+	engine/platform/rawPlatform.c                           \
 	engine/platform/linux/rawMemory.c                       \
 	-o build/unitTests/unitTestsXCB.out                     \
 	-I .                                                    \
@@ -43,5 +47,11 @@ unitTestsXCB:
 	-D RAW_ENGINE_NAME="\"RAW Rendering Engine\""           \
 	-D RAW_ENGINE_VERSION="VK_MAKE_VERSION(1, 0, 0)"        \
 	-D RAW_VULKAN_VERSION="VK_MAKE_VERSION(1, 0, 0)"        \
+	-D RAW_ENABLE_LOG_MSG                                   \
+	-D RAW_ENABLE_LOG_TRACE                                 \
+	-D RAW_ENABLE_LOG_INFO                                  \
+	-D RAW_ENABLE_LOG_SUCCESS                               \
+	-D RAW_ENABLE_LOG_WARNING                               \
+	-D RAW_ENABLE_LOG_ERROR                                 \
 	-ldl
 

@@ -36,22 +36,19 @@
 #ifndef RAW_MEMORY_H
 #define RAW_MEMORY_H
 
-#include <inttypes.h>
+#include <engine/utils/rawLog.h>
 
-// TODO: Implement log library
-#include <stdio.h>
+#include <inttypes.h>
 
 void rawMemAlloc(void** ptr, uint64_t size);
 void rawMemFree(void* ptr);
 
-#define RAW_MEM_ALLOC(ptr, size, file, line)                   \
-	printf("\tAllocating %" PRIu64 " bytes for pointer: " #ptr \
-		"\n\tFile: %s, Line: %d\n", (size), (file), (line));   \
+#define RAW_MEM_ALLOC(ptr, size)                                            \
+	RAW_LOG_TRACE("Allocating %" PRIu64 " bytes for pointer: " #ptr, size); \
 	rawMemAlloc((void**)&(ptr), (size))
 
-#define RAW_MEM_FREE(ptr, file, line)                \
-	printf("\tFreeing pointer: " #ptr                \
-		"\n\tFile: %s, Line: %d\n", (file), (line)); \
+#define RAW_MEM_FREE(ptr)                    \
+	RAW_LOG_TRACE("Freeing pointer: " #ptr); \
 	rawMemFree((ptr))
 
 #endif // RAW_MEMORY_H

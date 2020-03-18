@@ -40,7 +40,7 @@
 #include <stdbool.h>
 
 /*
- * If sucessfull, the function will allocate memory for:
+ * If successful, the function will allocate memory for:
  *     @*available_extensions
  *
  * It's the caller's responsibility to free that

@@ -39,7 +39,7 @@
 #include <inttypes.h>
 
 /*
- * If sucessfull, the function will allocate memory for:
+ * If successful, the function will allocate memory for:
  *     @*available_devices
  *
  * It's the caller's responsibility to free that
@@ -51,7 +51,7 @@ bool rawGetPhysicalDevices(
 	uint32_t* n_available_devices);
 
 /*
- * If sucessfull, the function will allocate memory for:
+ * If successful, the function will allocate memory for:
  *     @*available_extensions
  *     @*queue_families
  *
@@ -68,8 +68,9 @@ bool rawGetPhysicalDeviceCharacteristics(
 	uint32_t* n_queue_families);
 
 /*
- * Returns an index to a queue family with
- * the desired capabilities.
+ * If successful, an index to a queue family with
+ * the desired capabilities will be stored in parameter
+ *     @*queue_family_index
  */
 bool rawGetPhysicalDeviceQueueFamily(
 	VkPhysicalDevice physical_device,
