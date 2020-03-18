@@ -29,7 +29,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 17/03/2020
+ * Last modified: 18/03/2020
  */
 
 #include <src/rawMemory.h>
@@ -78,6 +78,10 @@ void testVulkanInstanceCreationAndDestruction() {
 		n_available_extensions, desired_extensions, n_desired_extensions,
 		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0)) &&
 		"Vulkan instance creation failed!");
+
+	assert(rawLoadVulkanInstanceLevelFunctions(
+		instance, desired_extensions, n_desired_extensions) &&
+		"rawLoadVulkanInstanceLevelFunctions failed!");
 
 	rawDestroyVulkanInstance(&instance);
 

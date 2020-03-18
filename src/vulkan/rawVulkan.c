@@ -26,24 +26,81 @@
  *
  * Vulkan runtime function loading
  *
+ * NOTE: The LOAD macro functions calls are passing another
+ * macros as arguments. The argument macros are expanded only
+ * inside the LOAD macro function definition, not on the call.
+ * When used with operators # and ## inside the definition,
+ * the parameter is also not expanded, giving the LOAD macro functions
+ * the expected result.
+ *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 16/03/2020
+ * Last modified: 18/03/2020
  */
 
 #include <src/vulkan/rawVulkan.h>
 
 // TODO: Implement log library
 #include <stdio.h>
+#include <string.h>
 
+/*
+ * Vulkan loader function
+ */
 PFN_vkGetInstanceProcAddr
 	vkGetInstanceProcAddr;
+
+/*
+ * Vulkan global level functions
+ */
 PFN_vkEnumerateInstanceExtensionProperties
 	vkEnumerateInstanceExtensionProperties;
 PFN_vkEnumerateInstanceLayerProperties
 	vkEnumerateInstanceLayerProperties;
 PFN_vkCreateInstance
 	vkCreateInstance;
+
+/*
+ * Vulkan instance level functions
+ */
+PFN_vkEnumeratePhysicalDevices
+	vkEnumeratePhysicalDevices;
+PFN_vkEnumerateDeviceExtensionProperties
+	vkEnumerateDeviceExtensionProperties;
+PFN_vkEnumerateDeviceLayerProperties
+	vkEnumerateDeviceLayerProperties;
+PFN_vkGetPhysicalDeviceFeatures
+	vkGetPhysicalDeviceFeatures;
+PFN_vkGetPhysicalDeviceProperties
+	vkGetPhysicalDeviceProperties;
+PFN_vkGetPhysicalDeviceQueueFamilyProperties
+	vkGetPhysicalDeviceQueueFamilyProperties;
+PFN_vkGetPhysicalDeviceMemoryProperties
+	vkGetPhysicalDeviceMemoryProperties;
+PFN_vkGetPhysicalDeviceFormatProperties
+	vkGetPhysicalDeviceFormatProperties;
+PFN_vkCreateDevice
+	vkCreateDevice;
+PFN_vkGetDeviceProcAddr
+	vkGetDeviceProcAddr;
+PFN_vkDestroyInstance
+	vkDestroyInstance;
+
+/*
+ * Vulkan instance level extensions
+ */
+PFN_vkGetPhysicalDeviceSurfaceSupportKHR
+	vkGetPhysicalDeviceSurfaceSupportKHR;
+PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR;
+PFN_vkGetPhysicalDeviceSurfaceFormatsKHR
+	vkGetPhysicalDeviceSurfaceFormatsKHR;
+PFN_vkGetPhysicalDeviceSurfacePresentModesKHR
+	vkGetPhysicalDeviceSurfacePresentModesKHR;
+PFN_vkDestroySurfaceKHR
+	vkDestroySurfaceKHR;
+PFN_vkCreateXcbSurfaceKHR
+	vkCreateXcbSurfaceKHR;
 
 bool rawLoadVulkan(RAW_VULKAN_LIBRARY vulkan) {
 	RAW_LOAD_VULKAN_LIBRARY(vulkan);
@@ -72,6 +129,65 @@ bool rawLoadVulkan(RAW_VULKAN_LIBRARY vulkan) {
 	LOAD(vkEnumerateInstanceExtensionProperties);
 	LOAD(vkEnumerateInstanceLayerProperties);
 	LOAD(vkCreateInstance);
+#undef LOAD
+
+	return true;
+}
+
+bool rawLoadVulkanInstanceLevelFunctions(
+	VkInstance instance,
+	char const* const* enabled_extensions,
+	uint32_t n_enabled_extensions) {
+
+#define LOAD(func)                                             \
+	func = (PFN_##func)vkGetInstanceProcAddr(instance, #func); \
+                                                               \
+	if (!func) {                                               \
+		puts("ERROR: " #func " could not be loaded!");         \
+		return false;                                          \
+	}
+
+	LOAD(vkEnumeratePhysicalDevices);
+	LOAD(vkEnumerateDeviceExtensionProperties);
+	LOAD(vkGetPhysicalDeviceFeatures);
+	LOAD(vkGetPhysicalDeviceProperties);
+	LOAD(vkGetPhysicalDeviceQueueFamilyProperties);
+	LOAD(vkGetPhysicalDeviceMemoryProperties);
+	LOAD(vkGetPhysicalDeviceFormatProperties);
+	LOAD(vkCreateDevice);
+	LOAD(vkGetDeviceProcAddr);
+	LOAD(vkDestroyInstance);
+#undef LOAD
+
+#define LOAD(func, extension)                                          \
+	for (uint32_t i = 0; i < n_enabled_extensions; ++i) {              \
+		if (strcmp(enabled_extensions[i], extension) == 0) {           \
+			func = (PFN_##func)vkGetInstanceProcAddr(instance, #func); \
+                                                                       \
+			if (!func) {                                               \
+				puts("ERROR: " #func " could not be loaded!");         \
+				return false;                                          \
+			}                                                          \
+		}                                                              \
+	}
+
+	LOAD(vkGetPhysicalDeviceSurfaceSupportKHR,
+		VK_KHR_SURFACE_EXTENSION_NAME);
+	LOAD(vkGetPhysicalDeviceSurfaceCapabilitiesKHR,
+		VK_KHR_SURFACE_EXTENSION_NAME);
+	LOAD(vkGetPhysicalDeviceSurfaceFormatsKHR,
+		VK_KHR_SURFACE_EXTENSION_NAME);
+	LOAD(vkGetPhysicalDeviceSurfacePresentModesKHR,
+		VK_KHR_SURFACE_EXTENSION_NAME);
+	LOAD(vkDestroySurfaceKHR,
+		VK_KHR_SURFACE_EXTENSION_NAME);
+
+#if defined (RAW_PLATFORM_LINUX)
+#if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
+	LOAD(vkCreateXcbSurfaceKHR,
+		VK_KHR_SURFACE_EXTENSION_NAME);
+#endif
+#endif
 #undef LOAD
 
 	return true;

@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 16/03/2020
+ * Last modified: 18/03/2020
  */
 
 #ifndef RAW_VULKAN_H
@@ -40,11 +40,17 @@
 
 #include <stdbool.h>
 
+/*
+ * Vulkan loader function
+ */
 #define vkGetInstanceProcAddr \
 	rawVkGetInstanceProcAddr
 extern PFN_vkGetInstanceProcAddr
 	vkGetInstanceProcAddr;
 
+/*
+ * Vulkan global level functions
+ */
 #define vkEnumerateInstanceExtensionProperties \
 	rawVkEnumerateInstanceExtensionProperties
 extern PFN_vkEnumerateInstanceExtensionProperties
@@ -61,10 +67,114 @@ extern PFN_vkCreateInstance
 	vkCreateInstance;
 
 /*
+ * Vulkan instance level functions
+ */
+#define vkEnumeratePhysicalDevices \
+	rawVkEnumeratePhysicalDevices
+extern PFN_vkEnumeratePhysicalDevices
+	vkEnumeratePhysicalDevices;
+
+#define vkEnumerateDeviceExtensionProperties \
+	rawVkEnumerateDeviceExtensionProperties
+extern PFN_vkEnumerateDeviceExtensionProperties
+	vkEnumerateDeviceExtensionProperties;
+
+#define vkEnumerateDeviceLayerProperties \
+	rawVkEnumerateDeviceLayerProperties
+extern PFN_vkEnumerateDeviceLayerProperties
+	vkEnumerateDeviceLayerProperties;
+
+#define vkGetPhysicalDeviceFeatures \
+	rawVkGetPhysicalDeviceFeatures
+extern PFN_vkGetPhysicalDeviceFeatures
+	vkGetPhysicalDeviceFeatures;
+
+#define vkGetPhysicalDeviceProperties \
+	rawVkGetPhysicalDeviceProperties
+extern PFN_vkGetPhysicalDeviceProperties
+	vkGetPhysicalDeviceProperties;
+
+#define vkGetPhysicalDeviceQueueFamilyProperties \
+	rawVkGetPhysicalDeviceQueueFamilyProperties
+extern PFN_vkGetPhysicalDeviceQueueFamilyProperties
+	vkGetPhysicalDeviceQueueFamilyProperties;
+
+#define vkGetPhysicalDeviceMemoryProperties \
+	rawVkGetPhysicalDeviceMemoryProperties
+extern PFN_vkGetPhysicalDeviceMemoryProperties
+	vkGetPhysicalDeviceMemoryProperties;
+
+#define vkGetPhysicalDeviceFormatProperties \
+	rawVkGetPhysicalDeviceFormatProperties
+extern PFN_vkGetPhysicalDeviceFormatProperties
+	vkGetPhysicalDeviceFormatProperties;
+
+#define vkCreateDevice \
+	rawVkCreateDevice
+extern PFN_vkCreateDevice
+	vkCreateDevice;
+
+#define vkGetDeviceProcAddr \
+	rawVkGetDeviceProcAddr
+extern PFN_vkGetDeviceProcAddr
+	vkGetDeviceProcAddr;
+
+#define vkDestroyInstance \
+	rawVkDestroyInstance
+extern PFN_vkDestroyInstance
+	vkDestroyInstance;
+
+/*
+ * Vulkan instance level extensions
+ */
+#define vkGetPhysicalDeviceSurfaceSupportKHR \
+	rawVkGetPhysicalDeviceSurfaceSupportKHR
+extern PFN_vkGetPhysicalDeviceSurfaceSupportKHR
+	vkGetPhysicalDeviceSurfaceSupportKHR;
+
+#define vkGetPhysicalDeviceSurfaceCapabilitiesKHR \
+	rawVkGetPhysicalDeviceSurfaceCapabilitiesKHR
+extern PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR;
+
+#define vkGetPhysicalDeviceSurfaceFormatsKHR \
+	rawVkGetPhysicalDeviceSurfaceFormatsKHR
+extern PFN_vkGetPhysicalDeviceSurfaceFormatsKHR
+	vkGetPhysicalDeviceSurfaceFormatsKHR;
+
+#define vkGetPhysicalDeviceSurfacePresentModesKHR \
+	rawVkGetPhysicalDeviceSurfacePresentModesKHR
+extern PFN_vkGetPhysicalDeviceSurfacePresentModesKHR
+	vkGetPhysicalDeviceSurfacePresentModesKHR;
+
+#define vkDestroySurfaceKHR \
+	rawVkDestroySurfaceKHR
+extern PFN_vkDestroySurfaceKHR
+	vkDestroySurfaceKHR;
+
+#if defined (RAW_PLATFORM_LINUX)
+#if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
+#define vkCreateXcbSurfaceKHR \
+	rawVkCreateXcbSurfaceKHR
+extern PFN_vkCreateXcbSurfaceKHR
+	vkCreateXcbSurfaceKHR;
+#endif
+#endif
+
+/*
  * Loads Vulkan runtime library, vkGetInstanceProcAddr
  * and Vulkan global level functions.
  */
 bool rawLoadVulkan(RAW_VULKAN_LIBRARY vulkan);
+
+/*
+ * Loads Vulkan intance level functions and extensions.
+ * All extensions required by the engine must be present on the hardware.
+ */
+bool rawLoadVulkanInstanceLevelFunctions(
+	VkInstance instance,
+	char const* const* enabled_extensions,
+	uint32_t n_enabled_extensions);
 
 #endif // RAW_VULKAN_H
 
