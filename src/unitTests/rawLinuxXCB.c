@@ -40,18 +40,19 @@
 #include <stdio.h>
 
 void testMemoryAllocation() {
-	puts("Running memory allocation test...");
+	puts("\nRunning memory allocation test...");
 	fflush(stdout);
 
-	void* ptr = rawMemAlloc(4294967296);
-	assert(ptr && "rawMemAlloc failed!");
+	void* ptr;
+	RAW_MEM_ALLOC(ptr, 4294967296, __FILE__, __LINE__);
+	assert(ptr && "RAW_MEM_ALLOC failed!");
 
-	rawMemFree(ptr);
+	RAW_MEM_FREE(ptr, __FILE__, __LINE__);
 	ptr = RAW_NULL_PTR;
 }
 
 void testVulkanLibraryLoading() {
-	puts("Running Vulkan library loading test...");
+	puts("\nRunning Vulkan library loading test...");
 	fflush(stdout);
 
 	RAW_VULKAN_LIBRARY vulkan;
@@ -59,7 +60,7 @@ void testVulkanLibraryLoading() {
 }
 
 void testVulkanInstanceCreationAndDestruction() {
-	puts("Running Vulkan instance creation test...");
+	puts("\nRunning Vulkan instance creation test...");
 	fflush(stdout);
 
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
@@ -88,7 +89,8 @@ void testVulkanInstanceCreationAndDestruction() {
 	assert(instance == VK_NULL_HANDLE &&
 		"Vulkan instance destruction failed!");
 
-	rawMemFree(available_extensions);
+	RAW_MEM_FREE(available_extensions, __FILE__, __LINE__);
+	available_extensions = RAW_NULL_PTR;
 }
 
 int main() {
@@ -96,6 +98,6 @@ int main() {
 	testVulkanLibraryLoading();
 	testVulkanInstanceCreationAndDestruction();
 
-	puts("All tests succeeded!");
+	puts("\nAll tests succeeded!\n");
 }
 

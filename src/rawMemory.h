@@ -30,16 +30,29 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 16/03/2020
+ * Last modified: 18/03/2020
  */
 
 #ifndef RAW_MEMORY_H
 #define RAW_MEMORY_H
 
-#include <stdint.h>
+#include <inttypes.h>
 
-void* rawMemAlloc(uint64_t size);
+// TODO: Implement log library
+#include <stdio.h>
+
+void rawMemAlloc(void** ptr, uint64_t size);
 void rawMemFree(void* ptr);
+
+#define RAW_MEM_ALLOC(ptr, size, file, line)                   \
+	printf("\tAllocating %" PRIu64 " bytes for pointer: " #ptr \
+		"\n\tFile: %s, Line: %d\n", (size), (file), (line));   \
+	rawMemAlloc((void**)&(ptr), (size))
+
+#define RAW_MEM_FREE(ptr, file, line)                \
+	printf("\tFreeing pointer: " #ptr                \
+		"\n\tFile: %s, Line: %d\n", (file), (line)); \
+	rawMemFree((ptr))
 
 #endif // RAW_MEMORY_H
 

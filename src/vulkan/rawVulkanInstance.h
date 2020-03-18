@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 16/03/2020
+ * Last modified: 18/03/2020
  */
 
 #ifndef RAW_VULKAN_INSTANCE_H
@@ -36,8 +36,8 @@
 
 #include <src/vulkan/rawVulkan.h>
 
+#include <inttypes.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 /*
  * If sucessfull, the function will allocate memory

@@ -30,15 +30,15 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 16/03/2020
+ * Last modified: 18/03/2020
  */
 
 #include <src/rawMemory.h>
 
 #include <stdlib.h>
 
-void* rawMemAlloc(uint64_t size) {
-	return malloc(size);
+void rawMemAlloc(void** ptr, uint64_t size) {
+	*ptr = malloc(size);
 }
 
 void rawMemFree(void* ptr) {

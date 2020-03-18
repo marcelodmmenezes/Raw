@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 17/03/2020
+ * Last modified: 18/03/2020
  */
 
 #include <src/vulkan/rawVulkanInstance.h>
@@ -51,11 +51,12 @@ bool rawEnumerateAvailableVulkanExtensions(
 		return false;
 	}
 
-	available_extensions = rawMemAlloc(
-		*n_extensions * sizeof(VkExtensionProperties));
+	RAW_MEM_ALLOC(available_extensions,
+		*n_extensions * sizeof(VkExtensionProperties),
+		__FILE__, __LINE__);
 
 	if (!available_extensions) {
-		puts("ERROR: rawMemAlloc failed on rawEnumerateAvailableExtensions!");
+		puts("ERROR: RAW_MEM_ALLOC failed on rawEnumerateAvailableExtensions!");
 		return false;
 	}
 
