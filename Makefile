@@ -27,13 +27,14 @@
 ##
 ## Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
 ## Created: 16/03/2020
-## Last modified: 16/03/2020
+## Last modified: 18/03/2020
 
 unitTestsXCB:
 	gcc -std=c11                                            \
 	src/unitTests/rawLinuxXCB.c                             \
 	src/vulkan/rawVulkan.c                                  \
 	src/vulkan/rawVulkanInstance.c                          \
+	src/vulkan/rawVulkanPhysicalDevice.c                    \
 	src/platform/linux/rawMemory.c                          \
 	-o build/unitTests/unitTestsXCB.out                     \
 	-I .                                                    \

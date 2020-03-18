@@ -34,13 +34,14 @@
 #include <src/vulkan/rawVulkanInstance.h>
 #include <src/rawMemory.h>
 
+#include <assert.h>
 #include <string.h>
 
 // TODO: Implement log library
 #include <stdio.h>
 
-bool rawEnumerateAvailableVulkanExtensions(
-	VkExtensionProperties* available_extensions,
+bool rawGetAvailableVulkanExtensions(
+	VkExtensionProperties** available_extensions,
 	uint32_t* n_extensions) {
 
 	VkResult result = vkEnumerateInstanceExtensionProperties(
@@ -51,19 +52,23 @@ bool rawEnumerateAvailableVulkanExtensions(
 		return false;
 	}
 
-	RAW_MEM_ALLOC(available_extensions,
+	RAW_MEM_ALLOC(*available_extensions,
 		*n_extensions * sizeof(VkExtensionProperties),
 		__FILE__, __LINE__);
 
-	if (!available_extensions) {
-		puts("ERROR: RAW_MEM_ALLOC failed on rawEnumerateAvailableExtensions!");
+	if (!*available_extensions) {
+		RAW_MEM_FREE(*available_extensions, __FILE__, __LINE__);
+		*available_extensions = RAW_NULL_PTR;
+		puts("ERROR: RAW_MEM_ALLOC failed on rawGetAvailableExtensions!");
 		return false;
 	}
 
 	result = vkEnumerateInstanceExtensionProperties(
-		RAW_NULL_PTR, n_extensions, available_extensions);
+		RAW_NULL_PTR, n_extensions, *available_extensions);
 
 	if (result != VK_SUCCESS) {
+		RAW_MEM_FREE(*available_extensions, __FILE__, __LINE__);
+		*available_extensions = RAW_NULL_PTR;
 		puts("ERROR: vkEnumerateInstanceExtensionProperties failed!");
 		return false;
 	}

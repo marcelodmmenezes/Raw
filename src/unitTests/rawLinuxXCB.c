@@ -35,12 +35,13 @@
 #include <src/rawMemory.h>
 #include <src/vulkan/rawVulkan.h>
 #include <src/vulkan/rawVulkanInstance.h>
+#include <src/vulkan/rawVulkanPhysicalDevice.h>
 
 #include <assert.h>
 #include <stdio.h>
 
 void testMemoryAllocation() {
-	puts("\nRunning memory allocation test...");
+	puts("\033[0;34mRunning memory allocation test...\033[0m");
 	fflush(stdout);
 
 	void* ptr;
@@ -49,30 +50,36 @@ void testMemoryAllocation() {
 
 	RAW_MEM_FREE(ptr, __FILE__, __LINE__);
 	ptr = RAW_NULL_PTR;
+
+	puts("\033[0;32mTest succeeded\n\033[0m");
+	fflush(stdout);
 }
 
 void testVulkanLibraryLoading() {
-	puts("\nRunning Vulkan library loading test...");
+	puts("\033[0;34mRunning Vulkan library loading test...\033[0m");
 	fflush(stdout);
 
 	RAW_VULKAN_LIBRARY vulkan;
 	assert(rawLoadVulkan(vulkan) && "loadVulkan failed!");
+
+	puts("\033[0;32mTest succeeded\n\033[0m");
+	fflush(stdout);
 }
 
 void testVulkanInstanceCreationAndDestruction() {
-	puts("\nRunning Vulkan instance creation test...");
+	puts("\033[0;34mRunning Vulkan instance creation test...\033[0m");
 	fflush(stdout);
 
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
-	assert(rawEnumerateAvailableVulkanExtensions(
-		available_extensions, &n_available_extensions) &&
+	assert(rawGetAvailableVulkanExtensions(
+		&available_extensions, &n_available_extensions) &&
 		"Vulkan extension enumeration failed!");
 
 	VkInstance instance = VK_NULL_HANDLE;
 
-	char const* const* desired_extensions = RAW_NULL_PTR;
+	char const** desired_extensions = RAW_NULL_PTR;
 	uint32_t n_desired_extensions = 0;
 
 	assert(rawCreateVulkanInstance(&instance, available_extensions,
@@ -91,13 +98,92 @@ void testVulkanInstanceCreationAndDestruction() {
 
 	RAW_MEM_FREE(available_extensions, __FILE__, __LINE__);
 	available_extensions = RAW_NULL_PTR;
+
+	puts("\033[0;32mTest succeeded\n\033[0m");
+	fflush(stdout);
+}
+
+void testVulkanPhysicalDeviceCreationAndDestruction() {
+	puts("\033[0;34mRunning Vulkan physical device creation test...\033[0m");
+	fflush(stdout);
+
+	// Instance creation
+	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
+	uint32_t n_available_extensions;
+
+	rawGetAvailableVulkanExtensions(
+		&available_extensions, &n_available_extensions);
+
+	VkInstance instance = VK_NULL_HANDLE;
+
+	char const** desired_extensions = RAW_NULL_PTR;
+	uint32_t n_desired_extensions = 0;
+
+	rawCreateVulkanInstance(&instance, available_extensions,
+		n_available_extensions, desired_extensions, n_desired_extensions,
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+
+	rawLoadVulkanInstanceLevelFunctions(
+		instance, desired_extensions, n_desired_extensions);
+	
+	// Physical device creation
+	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
+	uint32_t n_physical_devices;
+
+	assert(rawGetPhysicalDevices(instance,
+		&physical_devices, &n_physical_devices) &&
+		"rawGetPhysicalDevices failed!");
+
+	for (uint32_t i = 0; i < n_physical_devices; ++i) {
+		VkExtensionProperties* device_extensions = RAW_NULL_PTR;
+		uint32_t n_device_extensions;
+
+		VkQueueFamilyProperties* queue_families = RAW_NULL_PTR;
+		uint32_t n_queue_families;
+
+		VkPhysicalDeviceFeatures features;
+		VkPhysicalDeviceProperties properties;
+
+		assert(rawGetPhysicalDeviceCharacteristics(
+			physical_devices[i], &device_extensions,
+			&n_device_extensions, &features, &properties,
+			&queue_families, &n_queue_families) &&
+			"rawGetPhysicalDeviceCharacteristics failed!");
+
+		uint32_t queue_family_index;
+
+		assert(rawGetPhysicalDeviceQueueFamily(
+			physical_devices[i], queue_families,
+			n_queue_families, 0, &queue_family_index) &&
+			"rawGetPhysicalDeviceQueueFamily failed!");
+
+		RAW_MEM_FREE(queue_families, __FILE__, __LINE__);
+		queue_families = RAW_NULL_PTR;
+
+		RAW_MEM_FREE(device_extensions, __FILE__, __LINE__);
+		device_extensions = RAW_NULL_PTR;
+	}
+
+	RAW_MEM_FREE(physical_devices, __FILE__, __LINE__);
+	physical_devices = RAW_NULL_PTR;
+	
+	// Instance destruction
+	rawDestroyVulkanInstance(&instance);
+	instance == VK_NULL_HANDLE;
+
+	RAW_MEM_FREE(available_extensions, __FILE__, __LINE__);
+	available_extensions = RAW_NULL_PTR;
+
+	puts("\033[0;32mTest succeeded\n\033[0m");
+	fflush(stdout);
 }
 
 int main() {
 	testMemoryAllocation();
 	testVulkanLibraryLoading();
 	testVulkanInstanceCreationAndDestruction();
+	testVulkanPhysicalDeviceCreationAndDestruction();
 
-	puts("\nAll tests succeeded!\n");
+	puts("\033[0;32mAll tests succeeded!\n\033[0m");
 }
 
