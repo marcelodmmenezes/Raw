@@ -22,61 +22,48 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkanPhysicalDevice.h"
+/* Raw Rendering Engine - "engine/vulkan/rawVulkanInstance.h"
  *
- * Vulkan physical device related functions
+ * Vulkan instance related functions
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 18/03/2020
+ * Created: 16/03/2020
  * Last modified: 18/03/2020
  */
 
-#ifndef RAW_VULKAN_PHYSICAL_DEVICE_H
-#define RAW_VULKAN_PHYSICAL_DEVICE_H
+#ifndef RAW_VULKAN_INSTANCE_H
+#define RAW_VULKAN_INSTANCE_H
 
-#include <src/vulkan/rawVulkan.h>
+#include <engine/vulkan/rawVulkan.h>
 
 #include <inttypes.h>
-
-/*
- * If sucessfull, the function will allocate memory for:
- *     @*available_devices
- *
- * It's the caller's responsibility to free that
- * memory through a call to RAW_MEM_FREE
- */
-bool rawGetPhysicalDevices(
-	VkInstance instance,
-	VkPhysicalDevice** available_devices,
-	uint32_t* n_available_devices);
+#include <stdbool.h>
 
 /*
  * If sucessfull, the function will allocate memory for:
  *     @*available_extensions
- *     @*queue_families
  *
  * It's the caller's responsibility to free that
  * memory through a call to RAW_MEM_FREE
  */
-bool rawGetPhysicalDeviceCharacteristics(
-	VkPhysicalDevice physical_device,
+bool rawGetAvailableVulkanExtensions(
 	VkExtensionProperties** available_extensions,
-	uint32_t* n_available_extensions,
-	VkPhysicalDeviceFeatures* features,
-	VkPhysicalDeviceProperties* properties,
-	VkQueueFamilyProperties** queue_families,
-	uint32_t* n_queue_families);
+	uint32_t* n_extensions);
 
 /*
- * Returns an index to a queue family with
- * the desired capabilities.
+ * Creates the Vulkan instance only if all
+ * desired_extensions are available.
  */
-bool rawGetPhysicalDeviceQueueFamily(
-	VkPhysicalDevice physical_device,
-	VkQueueFamilyProperties* const queue_families,
-	uint32_t n_queue_families,
-	VkQueueFlags desired_capabilities,
-	uint32_t* queue_family_index);
+bool rawCreateVulkanInstance(
+	VkInstance* instance,
+	VkExtensionProperties* const available_extensions,
+	uint32_t n_available_extensions,
+	char const* const* desired_extensions,
+	uint32_t n_desired_extensions,
+	char const* const application_name,
+	uint32_t application_version);
 
-#endif // RAW_VULKAN_PHYSICAL_DEVICE_H
+void rawDestroyVulkanInstance(VkInstance* instance);
+
+#endif // RAW_VULKAN_INSTANCE_H
 

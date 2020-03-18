@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkanPhysicalDevice.c"
+/* Raw Rendering Engine - "engine/vulkan/rawVulkanPhysicalDevice.c"
  *
  * Vulkan physical device related functions
  *
@@ -31,8 +31,8 @@
  * Last modified: 18/03/2020
  */
 
-#include <src/vulkan/rawVulkanPhysicalDevice.h>
-#include <src/rawMemory.h>
+#include <engine/vulkan/rawVulkanPhysicalDevice.h>
+#include <engine/platform/rawMemory.h>
 
 #include <assert.h>
 

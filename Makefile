@@ -31,11 +31,11 @@
 
 unitTestsXCB:
 	gcc -std=c11                                            \
-	src/unitTests/rawLinuxXCB.c                             \
-	src/vulkan/rawVulkan.c                                  \
-	src/vulkan/rawVulkanInstance.c                          \
-	src/vulkan/rawVulkanPhysicalDevice.c                    \
-	src/platform/linux/rawMemory.c                          \
+	unitTests/rawLinuxXCB.c                                 \
+	engine/vulkan/rawVulkan.c                               \
+	engine/vulkan/rawVulkanInstance.c                       \
+	engine/vulkan/rawVulkanPhysicalDevice.c                 \
+	engine/platform/linux/rawMemory.c                       \
 	-o build/unitTests/unitTestsXCB.out                     \
 	-I .                                                    \
 	-D RAW_PLATFORM_LINUX -D RAW_PLATFORM_XCB_WINDOW_SYSTEM \

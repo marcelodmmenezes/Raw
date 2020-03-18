@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkan.c"
+/* Raw Rendering Engine - "engine/vulkan/rawVulkan.c"
  *
  * Vulkan runtime function loading
  *
@@ -38,7 +38,7 @@
  * Last modified: 18/03/2020
  */
 
-#include <src/vulkan/rawVulkan.h>
+#include <engine/vulkan/rawVulkan.h>
 
 // TODO: Implement log library
 #include <stdio.h>

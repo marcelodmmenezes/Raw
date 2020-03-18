@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkanInstance.c"
+/* Raw Rendering Engine - "engine/vulkan/rawVulkanInstance.c"
  *
  * Vulkan instance related functions
  *
@@ -31,8 +31,8 @@
  * Last modified: 18/03/2020
  */
 
-#include <src/vulkan/rawVulkanInstance.h>
-#include <src/rawMemory.h>
+#include <engine/vulkan/rawVulkanInstance.h>
+#include <engine/platform/rawMemory.h>
 
 #include <assert.h>
 #include <string.h>

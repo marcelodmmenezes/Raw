@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/vulkan/rawVulkan.h"
+/* Raw Rendering Engine - "engine/vulkan/rawVulkan.h"
  *
  * Vulkan runtime function loading
  *
@@ -34,7 +34,7 @@
 #ifndef RAW_VULKAN_H
 #define RAW_VULKAN_H
 
-#include <src/platform/rawOS.h>
+#include <engine/platform/rawOS.h>
 
 #include <vulkan/vulkan.h>
 

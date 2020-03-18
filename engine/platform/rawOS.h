@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/platform/rawOS.h"
+/* Raw Rendering Engine - "engine/platform/rawOS.h"
  *
  * Operating system abstraction API
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 16/03/2020
+ * Last modified: 18/03/2020
  */
 
 #ifndef RAW_OS_H

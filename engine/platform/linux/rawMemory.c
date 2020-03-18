@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/rawMemory.h"
+/* Raw Rendering Engine - "engine/platform/linux/rawMemory.c"
  *
- * Cross-platform memory allocation API
+ * Linux implementation for the memory allocation API
  *
  * TODO: Implement custom memory allocators
  *
@@ -33,26 +33,15 @@
  * Last modified: 18/03/2020
  */
 
-#ifndef RAW_MEMORY_H
-#define RAW_MEMORY_H
+#include <engine/platform/rawMemory.h>
 
-#include <inttypes.h>
+#include <stdlib.h>
 
-// TODO: Implement log library
-#include <stdio.h>
+void rawMemAlloc(void** ptr, uint64_t size) {
+	*ptr = malloc(size);
+}
 
-void rawMemAlloc(void** ptr, uint64_t size);
-void rawMemFree(void* ptr);
-
-#define RAW_MEM_ALLOC(ptr, size, file, line)                   \
-	printf("\tAllocating %" PRIu64 " bytes for pointer: " #ptr \
-		"\n\tFile: %s, Line: %d\n", (size), (file), (line));   \
-	rawMemAlloc((void**)&(ptr), (size))
-
-#define RAW_MEM_FREE(ptr, file, line)                \
-	printf("\tFreeing pointer: " #ptr                \
-		"\n\tFile: %s, Line: %d\n", (file), (line)); \
-	rawMemFree((ptr))
-
-#endif // RAW_MEMORY_H
+void rawMemFree(void* ptr) {
+	free(ptr);
+}
 

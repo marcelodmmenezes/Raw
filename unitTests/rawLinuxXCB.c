@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "src/unitTests/rawLinuxXCB.c"
+/* Raw Rendering Engine - "engine/unitTests/rawLinuxXCB.c"
  *
  * Unit testing procedures
  * Linux, XCB
@@ -32,10 +32,10 @@
  * Last modified: 18/03/2020
  */
 
-#include <src/rawMemory.h>
-#include <src/vulkan/rawVulkan.h>
-#include <src/vulkan/rawVulkanInstance.h>
-#include <src/vulkan/rawVulkanPhysicalDevice.h>
+#include <engine/platform/rawMemory.h>
+#include <engine/vulkan/rawVulkan.h>
+#include <engine/vulkan/rawVulkanInstance.h>
+#include <engine/vulkan/rawVulkanPhysicalDevice.h>
 
 #include <assert.h>
 #include <stdio.h>
