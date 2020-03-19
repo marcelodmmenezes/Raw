@@ -49,8 +49,8 @@ bool rawGetVulkanPhysicalDevices(
 		return false;
 	}
 
-	RAW_MEM_ALLOC(*available_devices,
-		*n_available_devices * sizeof(VkPhysicalDevice));
+	RAW_MEM_ALLOC(*available_devices, (uint64_t)*n_available_devices,
+		sizeof(VkPhysicalDevice));
 
 	if (!*available_devices) {
 		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on rawEnumeratePhysicalDevices!");
@@ -94,8 +94,8 @@ bool rawGetVulkanPhysicalDeviceCharacteristics(
 		return false;
 	}
 
-	RAW_MEM_ALLOC(*available_extensions,
-		*n_available_extensions * sizeof(VkExtensionProperties));
+	RAW_MEM_ALLOC(*available_extensions, (uint64_t)*n_available_extensions,
+		sizeof(VkExtensionProperties));
 
 	if (!*available_extensions) {
 		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on "
@@ -133,8 +133,8 @@ bool rawGetVulkanPhysicalDeviceCharacteristics(
 		return false;
 	}
 
-	RAW_MEM_ALLOC(*queue_families,
-		*n_queue_families * sizeof(VkQueueFamilyProperties));
+	RAW_MEM_ALLOC(*queue_families, (uint64_t)*n_queue_families,
+		sizeof(VkQueueFamilyProperties));
 
 	vkGetPhysicalDeviceQueueFamilyProperties(
 		physical_device, n_queue_families, *queue_families);
@@ -218,7 +218,7 @@ bool rawSelectPhysicalDeviceWithDesiredCharacteristics(
 		uint32_t* n_queues_per_queue_family = RAW_NULL_PTR;
 
 		RAW_MEM_ALLOC(n_queues_per_queue_family,
-			n_queue_families * sizeof(uint32_t));
+			(uint64_t)n_queue_families, sizeof(uint32_t));
 
 		if (!n_queues_per_queue_family) {
 			RAW_LOG_ERROR("rawSelectPhysicalDeviceWithDesiredCharacteristics "
@@ -275,10 +275,11 @@ bool rawSelectPhysicalDeviceWithDesiredCharacteristics(
 
 			// TODO: Give different priorities for each queue
 			RAW_MEM_ALLOC(*queue_priorities,
-				*n_queue_priorities * sizeof(float));
+				(uint64_t)*n_queue_priorities, sizeof(float));
 
 			RAW_MEM_ALLOC(*queue_create_infos,
-				*n_queue_create_infos * sizeof(VkDeviceQueueCreateInfo));
+				(uint64_t)*n_queue_create_infos,
+				sizeof(VkDeviceQueueCreateInfo));
 
 			if (!(*queue_priorities) || !(*queue_create_infos)) {
 				RAW_LOG_ERROR(

@@ -27,8 +27,6 @@
  * Cross-platform memory allocation API
  *
  * TODO: Implement custom memory allocators
- * TODO: RAW_MEM_ALLOC receives 3 parameters:
- *           pointer, number of elements, size of one element
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
@@ -46,11 +44,12 @@
 void rawMemAlloc(void** ptr, uint64_t size);
 void rawMemFree(void* ptr);
 
-#define RAW_MEM_ALLOC(ptr, size)                \
-	{                                           \
-		RAW_LOG_TRACE("Allocating %" PRIu64     \
-			" bytes for pointer: " #ptr, size); \
-		rawMemAlloc((void**)&(ptr), (size));    \
+#define RAW_MEM_ALLOC(ptr, n_elements, element_size)                \
+	{                                                               \
+		RAW_LOG_TRACE("Allocating %" PRIu64 " elements "            \
+			"(%" PRIu64 " bytes) for pointer: " #ptr,               \
+			(n_elements), (n_elements) * (element_size));           \
+		rawMemAlloc((void**)&(ptr), (n_elements) * (element_size)); \
 	}
 
 #define RAW_MEM_FREE(ptr)                        \

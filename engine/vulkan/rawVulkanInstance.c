@@ -49,8 +49,8 @@ bool rawGetAvailableVulkanInstanceExtensions(
 		return false;
 	}
 
-	RAW_MEM_ALLOC(*available_extensions,
-		*n_extensions * sizeof(VkExtensionProperties));
+	RAW_MEM_ALLOC(*available_extensions, (uint64_t)*n_extensions,
+		sizeof(VkExtensionProperties));
 
 	if (!*available_extensions) {
 		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on rawGetAvailableExtensions!");

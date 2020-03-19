@@ -58,7 +58,7 @@ void testMemoryAllocation() {
 	RAW_LOG_CMSG("Running memory allocation test...\n", RAW_LOG_BLUE);
 
 	void* ptr;
-	RAW_MEM_ALLOC(ptr, 4294967296);
+	RAW_MEM_ALLOC(ptr, 4294967296, 1);
 	RAW_ASSERT(ptr, "RAW_MEM_ALLOC failed!");
 
 	RAW_MEM_FREE(ptr);
