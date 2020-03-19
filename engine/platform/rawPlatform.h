@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 18/03/2020
+ * Last modified: 19/03/2020
  */
 
 #ifndef RAW_PLATFORM_H
@@ -67,15 +67,19 @@ void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
  *********************************/
 #include <dlfcn.h>
 
-#define RAW_LOAD_LIBRARY_FUNCTION(library, function) dlsym(library, function)
+#define RAW_LOAD_LIBRARY_FUNCTION(library, function) \
+	dlsym(library, function)
 
 /********************************
  ************************* Vulkan
  ********************************/
 #define RAW_VULKAN_LIBRARY void*
 
-#define RAW_LOAD_VULKAN_LIBRARY(library) \
+#define RAW_LOAD_VULKAN_LIBRARY(library)         \
 	library = dlopen("libvulkan.so.1", RTLD_NOW)
+
+#define RAW_RELEASE_VULKAN_LIBRARY(library) \
+	dlclose(library);
 
 #if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
 #define VK_USE_PLATFORM_XCB_KHR

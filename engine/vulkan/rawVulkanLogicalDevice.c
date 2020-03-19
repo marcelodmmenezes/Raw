@@ -72,11 +72,9 @@ bool rawCreateVulkanLogicalDevice(
 }
 
 void rawDestroyVulkanLogicalDevice(VkDevice* logical_device) {
-	RAW_ASSERT(false, "NOT IMPLEMENTED: vkDestroyDevice not loaded");
-
 	if (*logical_device) {
 		// TODO: Pass allocation callback
-		//vkDestroyDevice(*logical_device, RAW_NULL_PTR);
+		vkDestroyDevice(*logical_device, RAW_NULL_PTR);
 		logical_device = VK_NULL_HANDLE;
 	}
 	else
