@@ -22,34 +22,32 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "engine/platform/rawMemory.h"
+/* Raw Rendering Engine - "engine/utils/rawAssert.h"
  *
- * Cross-platform memory allocation API
- *
- * TODO: Implement custom memory allocators
+ * Assertion macros 
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 16/03/2020
+ * Created: 19/03/2020
  * Last modified: 19/03/2020
  */
 
-#ifndef RAW_MEMORY_H
-#define RAW_MEMORY_H
+#ifndef RAW_ASSERT_H
+#define RAW_ASSERT_H
 
 #include <engine/utils/rawLogger.h>
 
-#include <inttypes.h>
+#include <stdlib.h>
 
-void rawMemAlloc(void** ptr, uint64_t size);
-void rawMemFree(void* ptr);
+#if defined (RAW_BUILD_DEBUG)
+#define RAW_ASSERT(condition, message)          \
+	if (!(condition)) {                         \
+		RAW_LOG_ERROR("RAW_ASSERT: " #condition \
+			"\n\t         " message);           \
+		abort();                                \
+	}
+#else
+#define RAW_ASSERT(condition, message)
+#endif
 
-#define RAW_MEM_ALLOC(ptr, size)                                            \
-	RAW_LOG_TRACE("Allocating %" PRIu64 " bytes for pointer: " #ptr, size); \
-	rawMemAlloc((void**)&(ptr), (size))
-
-#define RAW_MEM_FREE(ptr)                    \
-	RAW_LOG_TRACE("Freeing pointer: " #ptr); \
-	rawMemFree((ptr))
-
-#endif // RAW_MEMORY_H
+#endif // RAW_ASSERT_H
 

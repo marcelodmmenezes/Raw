@@ -25,15 +25,15 @@
 ## Raw Rendering Engine - "Makefile"
 ##
 ## Basic Makefile for testing
-## TODO: Reduce compilation time
+## TODO: Make build system cross-platform with CMake
 ##
 ## Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
 ## Created: 16/03/2020
-## Last modified: 18/03/2020
+## Last modified: 19/03/2020
 ##
 
 unitTestsXCB:
-	gcc -std=c11                                            \
+	gcc -std=c11 -Wall                                      \
 	unitTests/rawLinuxXCB.c                                 \
 	engine/vulkan/rawVulkan.c                               \
 	engine/vulkan/rawVulkanInstance.c                       \
@@ -53,5 +53,6 @@ unitTestsXCB:
 	-D RAW_ENABLE_LOG_SUCCESS                               \
 	-D RAW_ENABLE_LOG_WARNING                               \
 	-D RAW_ENABLE_LOG_ERROR                                 \
+	-D RAW_BUILD_DEBUG                                      \
 	-ldl
 

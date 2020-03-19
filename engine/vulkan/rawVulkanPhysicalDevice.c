@@ -28,14 +28,12 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 18/03/2020
+ * Last modified: 19/03/2020
  */
 
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
 #include <engine/platform/rawMemory.h>
-#include <engine/utils/rawLog.h>
-
-#include <assert.h>
+#include <engine/utils/rawLogger.h>
 
 bool rawGetPhysicalDevices(
 	VkInstance instance,

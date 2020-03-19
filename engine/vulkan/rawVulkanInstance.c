@@ -28,13 +28,12 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 18/03/2020
+ * Last modified: 19/03/2020
  */
 
 #include <engine/vulkan/rawVulkanInstance.h>
 #include <engine/platform/rawMemory.h>
 
-#include <assert.h>
 #include <string.h>
 
 bool rawGetAvailableVulkanExtensions(

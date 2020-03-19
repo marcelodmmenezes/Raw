@@ -29,16 +29,15 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 18/03/2020
+ * Last modified: 19/03/2020
  */
 
 #include <engine/platform/rawMemory.h>
 #include <engine/vulkan/rawVulkan.h>
 #include <engine/vulkan/rawVulkanInstance.h>
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
-#include <engine/utils/rawLog.h>
-
-#include <assert.h>
+#include <engine/utils/rawLogger.h>
+#include <engine/utils/rawAssert.h>
 
 // Not exactly a unit test but useful anyways
 void testLoggingLibrary() {
@@ -46,10 +45,10 @@ void testLoggingLibrary() {
 
 	RAW_LOG_MSG("RAW_LOG_MSG\n");
 	RAW_LOG_CMSG("RAW_LOG_CMSG\n", RAW_LOG_CYAN);
-	RAW_LOG_TRACE("RAW_LOG_TRACE %d\n", 1);
-	RAW_LOG_INFO("RAW_LOG_INFO %d\n", 2);
-	RAW_LOG_WARNING("RAW_LOG_WARNING %d\n", 3);
-	RAW_LOG_ERROR("RAW_LOG_ERROR %d\n", 4);
+	RAW_LOG_TRACE("RAW_LOG_TRACE %d", 1);
+	RAW_LOG_INFO("RAW_LOG_INFO %d", 2);
+	RAW_LOG_WARNING("RAW_LOG_WARNING %d", 3);
+	RAW_LOG_ERROR("RAW_LOG_ERROR %d", 4);
 
 	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
@@ -59,7 +58,7 @@ void testMemoryAllocation() {
 
 	void* ptr;
 	RAW_MEM_ALLOC(ptr, 4294967296);
-	assert(ptr && "RAW_MEM_ALLOC failed!");
+	RAW_ASSERT(ptr, "RAW_MEM_ALLOC failed!");
 
 	RAW_MEM_FREE(ptr);
 	ptr = RAW_NULL_PTR;
@@ -70,8 +69,11 @@ void testMemoryAllocation() {
 void testVulkanLibraryLoading() {
 	RAW_LOG_CMSG("Running Vulkan library loading test...\n", RAW_LOG_BLUE);
 
-	RAW_VULKAN_LIBRARY vulkan;
-	assert(rawLoadVulkan(vulkan) && "loadVulkan failed!");
+	RAW_VULKAN_LIBRARY vulkan = RAW_NULL_PTR;
+
+	bool result = rawLoadVulkan(vulkan);
+
+	RAW_ASSERT(result, "loadVulkan failed!");
 
 	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
@@ -82,27 +84,30 @@ void testVulkanInstanceCreationAndDestruction() {
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
-	assert(rawGetAvailableVulkanExtensions(
-		&available_extensions, &n_available_extensions) &&
-		"Vulkan extension enumeration failed!");
+	bool result = rawGetAvailableVulkanExtensions(
+		&available_extensions, &n_available_extensions);
+
+	RAW_ASSERT(result, "Vulkan extension enumeration failed!");
 
 	VkInstance instance = VK_NULL_HANDLE;
 
 	char const** desired_extensions = RAW_NULL_PTR;
 	uint32_t n_desired_extensions = 0;
 
-	assert(rawCreateVulkanInstance(&instance, available_extensions,
+	result = rawCreateVulkanInstance(&instance, available_extensions,
 		n_available_extensions, desired_extensions, n_desired_extensions,
-		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0)) &&
-		"Vulkan instance creation failed!");
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
 
-	assert(rawLoadVulkanInstanceLevelFunctions(
-		instance, desired_extensions, n_desired_extensions) &&
-		"rawLoadVulkanInstanceLevelFunctions failed!");
+	RAW_ASSERT(result, "Vulkan instance creation failed!");
+
+	result = rawLoadVulkanInstanceLevelFunctions(
+		instance, desired_extensions, n_desired_extensions);
+
+	RAW_ASSERT(result, "rawLoadVulkanInstanceLevelFunctions failed!");
 
 	rawDestroyVulkanInstance(&instance);
 
-	assert(instance == VK_NULL_HANDLE &&
+	RAW_ASSERT(instance == VK_NULL_HANDLE,
 		"Vulkan instance destruction failed!");
 
 	RAW_MEM_FREE(available_extensions);
@@ -138,9 +143,10 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
 	uint32_t n_physical_devices;
 
-	assert(rawGetPhysicalDevices(instance,
-		&physical_devices, &n_physical_devices) &&
-		"rawGetPhysicalDevices failed!");
+	bool result = rawGetPhysicalDevices(instance,
+			&physical_devices, &n_physical_devices);
+
+	RAW_ASSERT(result, "rawGetPhysicalDevices failed!");
 
 	for (uint32_t i = 0; i < n_physical_devices; ++i) {
 		VkExtensionProperties* device_extensions = RAW_NULL_PTR;
@@ -152,18 +158,20 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 		VkPhysicalDeviceFeatures features;
 		VkPhysicalDeviceProperties properties;
 
-		assert(rawGetPhysicalDeviceCharacteristics(
+		result = rawGetPhysicalDeviceCharacteristics(
 			physical_devices[i], &device_extensions,
 			&n_device_extensions, &features, &properties,
-			&queue_families, &n_queue_families) &&
-			"rawGetPhysicalDeviceCharacteristics failed!");
+			&queue_families, &n_queue_families);
+
+		RAW_ASSERT(result, "rawGetPhysicalDeviceCharacteristics failed!");
 
 		uint32_t queue_family_index;
 
-		assert(rawGetPhysicalDeviceQueueFamily(
+		result = rawGetPhysicalDeviceQueueFamily(
 			physical_devices[i], queue_families,
-			n_queue_families, 0, &queue_family_index) &&
-			"rawGetPhysicalDeviceQueueFamily failed!");
+			n_queue_families, 0, &queue_family_index);
+
+		RAW_ASSERT(result, "rawGetPhysicalDeviceQueueFamily failed!");
 
 		RAW_MEM_FREE(queue_families);
 		queue_families = RAW_NULL_PTR;
@@ -177,7 +185,7 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 	
 	// Instance destruction
 	rawDestroyVulkanInstance(&instance);
-	instance == VK_NULL_HANDLE;
+	instance = VK_NULL_HANDLE;
 
 	RAW_MEM_FREE(available_extensions);
 	available_extensions = RAW_NULL_PTR;

@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "engine/utils/rawLog.h"
+/* Raw Rendering Engine - "engine/utils/rawLogger.h"
  *
  * Basic logging utilities
  * TODO: add custom file options
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 18/03/2020
+ * Last modified: 19/03/2020
  */
 
 #ifndef RAW_LOG_H
