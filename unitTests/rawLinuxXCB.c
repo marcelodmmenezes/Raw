@@ -36,6 +36,7 @@
 #include <engine/vulkan/rawVulkan.h>
 #include <engine/vulkan/rawVulkanInstance.h>
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
+#include <engine/vulkan/rawVulkanLogicalDevice.h>
 #include <engine/utils/rawLogger.h>
 #include <engine/utils/rawAssert.h>
 
@@ -61,7 +62,6 @@ void testMemoryAllocation() {
 	RAW_ASSERT(ptr, "RAW_MEM_ALLOC failed!");
 
 	RAW_MEM_FREE(ptr);
-	ptr = RAW_NULL_PTR;
 
 	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
@@ -84,7 +84,7 @@ void testVulkanInstanceCreationAndDestruction() {
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
-	bool result = rawGetAvailableVulkanExtensions(
+	bool result = rawGetAvailableVulkanInstanceExtensions(
 		&available_extensions, &n_available_extensions);
 
 	RAW_ASSERT(result, "Vulkan extension enumeration failed!");
@@ -111,7 +111,6 @@ void testVulkanInstanceCreationAndDestruction() {
 		"Vulkan instance destruction failed!");
 
 	RAW_MEM_FREE(available_extensions);
-	available_extensions = RAW_NULL_PTR;
 
 	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
@@ -124,7 +123,7 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
-	rawGetAvailableVulkanExtensions(
+	rawGetAvailableVulkanInstanceExtensions(
 		&available_extensions, &n_available_extensions);
 
 	VkInstance instance = VK_NULL_HANDLE;
@@ -143,8 +142,8 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
 	uint32_t n_physical_devices;
 
-	bool result = rawGetPhysicalDevices(instance,
-			&physical_devices, &n_physical_devices);
+	bool result = rawGetVulkanPhysicalDevices(
+		instance, &physical_devices, &n_physical_devices);
 
 	RAW_ASSERT(result, "rawGetPhysicalDevices failed!");
 
@@ -158,7 +157,7 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 		VkPhysicalDeviceFeatures features;
 		VkPhysicalDeviceProperties properties;
 
-		result = rawGetPhysicalDeviceCharacteristics(
+		result = rawGetVulkanPhysicalDeviceCharacteristics(
 			physical_devices[i], &device_extensions,
 			&n_device_extensions, &features, &properties,
 			&queue_families, &n_queue_families);
@@ -167,28 +166,183 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 
 		uint32_t queue_family_index;
 
-		result = rawGetPhysicalDeviceQueueFamily(
+		result = rawGetVulkanPhysicalDeviceQueueFamilyIndex(
 			physical_devices[i], queue_families,
 			n_queue_families, 0, &queue_family_index);
 
 		RAW_ASSERT(result, "rawGetPhysicalDeviceQueueFamily failed!");
 
 		RAW_MEM_FREE(queue_families);
-		queue_families = RAW_NULL_PTR;
-
 		RAW_MEM_FREE(device_extensions);
-		device_extensions = RAW_NULL_PTR;
 	}
 
 	RAW_MEM_FREE(physical_devices);
-	physical_devices = RAW_NULL_PTR;
 	
 	// Instance destruction
 	rawDestroyVulkanInstance(&instance);
 	instance = VK_NULL_HANDLE;
 
 	RAW_MEM_FREE(available_extensions);
-	available_extensions = RAW_NULL_PTR;
+
+	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+}
+
+void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
+	RAW_LOG_CMSG("Running RAW Vulkan physical device "
+		"selection test...\n", RAW_LOG_BLUE);
+
+	// Instance creation
+	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
+	uint32_t n_available_extensions;
+
+	rawGetAvailableVulkanInstanceExtensions(
+		&available_extensions, &n_available_extensions);
+
+	VkInstance instance = VK_NULL_HANDLE;
+
+	char const** desired_extensions = RAW_NULL_PTR;
+	uint32_t n_desired_extensions = 0;
+
+	rawCreateVulkanInstance(&instance, available_extensions,
+		n_available_extensions, desired_extensions, n_desired_extensions,
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+
+	rawLoadVulkanInstanceLevelFunctions(
+		instance, desired_extensions, n_desired_extensions);
+	
+	// Physical device creation
+	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
+	uint32_t n_physical_devices;
+
+	rawGetVulkanPhysicalDevices(
+		instance, &physical_devices, &n_physical_devices);
+
+	VkPhysicalDeviceFeatures features;
+	VkPhysicalDeviceProperties properties;
+
+	// rawSelectPhysicalDeviceWithDesiredCharacteristics test
+	VkQueueFlags* desired_queue_capabilities = RAW_NULL_PTR;
+	uint32_t n_desired_queue_capabilities = 0;
+
+	float* queue_priorities = RAW_NULL_PTR;
+	uint32_t n_queue_priorities;
+
+	VkDeviceQueueCreateInfo* queue_create_infos = RAW_NULL_PTR;
+	uint32_t n_queue_create_infos;
+
+	uint32_t physical_device_index;
+
+	bool result = rawSelectPhysicalDeviceWithDesiredCharacteristics(
+		physical_devices, n_physical_devices,
+		desired_extensions, n_desired_extensions,
+		&features, &properties,
+		desired_queue_capabilities, n_desired_queue_capabilities,
+		&queue_priorities, &n_queue_priorities,
+		&queue_create_infos, &n_queue_create_infos,
+		&physical_device_index);
+
+	RAW_ASSERT(result,
+		"rawSelectPhysicalDeviceWithDesiredCharacteristics failed!");
+
+	RAW_LOG_INFO("Selecting physical device %d", physical_device_index);
+
+	RAW_MEM_FREE(queue_create_infos);
+	RAW_MEM_FREE(queue_priorities);
+	RAW_MEM_FREE(physical_devices);
+	
+	// Instance destruction
+	rawDestroyVulkanInstance(&instance);
+	instance = VK_NULL_HANDLE;
+
+	RAW_MEM_FREE(available_extensions);
+
+	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+}
+
+void testVulkanLogicalDeviceCreationAndDestruction() {
+	RAW_LOG_CMSG("Running RAW Vulkan logical device "
+		"creation test...\n", RAW_LOG_BLUE);
+
+	// Instance creation
+	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
+	uint32_t n_available_extensions;
+
+	rawGetAvailableVulkanInstanceExtensions(
+		&available_extensions, &n_available_extensions);
+
+	VkInstance instance = VK_NULL_HANDLE;
+
+	char const** instance_extensions = RAW_NULL_PTR;
+	uint32_t n_desired_extensions = 0;
+
+	rawCreateVulkanInstance(&instance, available_extensions,
+		n_available_extensions, instance_extensions, n_desired_extensions,
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+
+	rawLoadVulkanInstanceLevelFunctions(
+		instance, instance_extensions, n_desired_extensions);
+	
+	// Physical device creation and selection
+	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
+	uint32_t n_physical_devices;
+
+	rawGetVulkanPhysicalDevices(
+		instance, &physical_devices, &n_physical_devices);
+
+	char const** device_extensions = RAW_NULL_PTR;
+	n_desired_extensions = 0;
+
+	VkPhysicalDeviceFeatures features;
+	VkPhysicalDeviceProperties properties;
+
+	VkQueueFlags desired_queue_capabilities[] = {
+		VK_QUEUE_GRAPHICS_BIT,
+		VK_QUEUE_COMPUTE_BIT
+	};
+
+	uint32_t n_desired_queue_capabilities = 2;
+
+	float* queue_priorities = RAW_NULL_PTR;
+	uint32_t n_queue_priorities;
+
+	VkDeviceQueueCreateInfo* queue_create_infos = RAW_NULL_PTR;
+	uint32_t n_queue_create_infos;
+
+	uint32_t physical_device_index;
+
+	rawSelectPhysicalDeviceWithDesiredCharacteristics(
+		physical_devices, n_physical_devices,
+		device_extensions, n_desired_extensions,
+		&features, &properties,
+		desired_queue_capabilities, n_desired_queue_capabilities,
+		&queue_priorities, &n_queue_priorities,
+		&queue_create_infos, &n_queue_create_infos,
+		&physical_device_index);
+
+	RAW_LOG_INFO("Selecting physical device %d", physical_device_index);
+
+	// Logical device creation
+	VkDevice logical_device;
+
+	bool result = rawCreateVulkanLogicalDevice(
+		physical_devices[physical_device_index],
+		queue_create_infos, n_queue_create_infos,
+		device_extensions, n_desired_extensions,
+		&features, &logical_device);
+
+	RAW_ASSERT(result, "rawCreateVulkanLogicalDevice failed!");
+
+	rawDestroyVulkanLogicalDevice(&logical_device);
+
+	RAW_MEM_FREE(queue_create_infos);
+	RAW_MEM_FREE(queue_priorities);
+	RAW_MEM_FREE(physical_devices);
+	
+	// Instance destruction
+	rawDestroyVulkanInstance(&instance);
+	instance = VK_NULL_HANDLE;
+
+	RAW_MEM_FREE(available_extensions);
 
 	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
 }
@@ -199,6 +353,8 @@ int main() {
 	testVulkanLibraryLoading();
 	testVulkanInstanceCreationAndDestruction();
 	testVulkanPhysicalDeviceCreationAndDestruction();
+	testRawSelectPhysicalDeviceWithDesiredCharacteristics();
+	testVulkanLogicalDeviceCreationAndDestruction();
 
 	RAW_LOG_CMSG("All tests succeeded!\n", RAW_LOG_GREEN);
 }

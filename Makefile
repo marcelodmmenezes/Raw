@@ -38,6 +38,7 @@ unitTestsXCB:
 	engine/vulkan/rawVulkan.c                               \
 	engine/vulkan/rawVulkanInstance.c                       \
 	engine/vulkan/rawVulkanPhysicalDevice.c                 \
+	engine/vulkan/rawVulkanLogicalDevice.c                  \
 	engine/platform/rawPlatform.c                           \
 	engine/platform/linux/rawMemory.c                       \
 	-o build/unitTests/unitTestsXCB.out                     \

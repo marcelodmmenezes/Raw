@@ -54,55 +54,67 @@
 #define RAW_LOG_DEFAULT RAW_PLATFORM_TERMINAL_COLOR_DEFAULT
 
 #if defined (RAW_ENABLE_LOG_MSG)
-#define RAW_LOG_MSG(msg)                             \
-	rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT); \
-	printf(msg)
+#define RAW_LOG_MSG(msg)                                 \
+	{                                                    \
+		rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT); \
+		printf(msg);                                     \
+	}
 
-#define RAW_LOG_CMSG(msg, color)                     \
-	rawPlatformSwitchTerminalColor(color);           \
-	printf(msg);                                     \
-	rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT)
+#define RAW_LOG_CMSG(msg, color)                         \
+	{                                                    \
+		rawPlatformSwitchTerminalColor(color);           \
+		printf(msg);                                     \
+		rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT); \
+	}
 #else
 #define RAW_LOG_MSG(msg)
 #define RAW_LOG_CMSG(msg, color)
 #endif
 
 #if defined (RAW_ENABLE_LOG_TRACE)
-#define RAW_LOG_TRACE(...)                                            \
-	rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT);                  \
-	printf("\n\tTRACE:   ");                                          \
-	printf(__VA_ARGS__);                                              \
-	printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__);
+#define RAW_LOG_TRACE(...)                                                \
+	{                                                                     \
+		rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT);                  \
+		printf("\n\tTRACE:   ");                                          \
+		printf(__VA_ARGS__);                                              \
+		printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__); \
+	}
 #else
 #define LOG_TRACE(...)
 #endif
 
 #if defined (RAW_ENABLE_LOG_INFO)
-#define RAW_LOG_INFO(...)                                             \
-	rawPlatformSwitchTerminalColor(RAW_LOG_BLUE);                     \
-	printf("\n\tINFO:    ");                                          \
-	printf(__VA_ARGS__);                                              \
-	printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__);
+#define RAW_LOG_INFO(...)                                                 \
+	{                                                                     \
+		rawPlatformSwitchTerminalColor(RAW_LOG_BLUE);                     \
+		printf("\n\tINFO:    ");                                          \
+		printf(__VA_ARGS__);                                              \
+		printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__); \
+	}
 #else
 #define LOG_INFO(...)
 #endif
 
 #if defined (RAW_ENABLE_LOG_WARNING)
-#define RAW_LOG_WARNING(...)                                          \
-	rawPlatformSwitchTerminalColor(RAW_LOG_YELLOW);                   \
-	printf("\n\tWARNING: ");                                          \
-	printf(__VA_ARGS__);                                              \
-	printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__);
+#define RAW_LOG_WARNING(...)                                              \
+	{                                                                     \
+		rawPlatformSwitchTerminalColor(RAW_LOG_YELLOW);                   \
+		printf("\n\tWARNING: ");                                          \
+		printf(__VA_ARGS__);                                              \
+		printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__); \
+	}
 #else
 #define LOG_WARNING(...)
 #endif
 
 #if defined (RAW_ENABLE_LOG_ERROR)
-#define RAW_LOG_ERROR(...)                                            \
-	rawPlatformSwitchTerminalColor(RAW_LOG_RED);                      \
-	printf("\n\tERROR:   ");                                          \
-	printf(__VA_ARGS__);                                              \
-	printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__);
+#define RAW_LOG_ERROR(...)                                                \
+	{                                                                     \
+		rawPlatformSwitchTerminalColor(RAW_LOG_RED);                      \
+		printf("\n\tERROR:   ");                                          \
+		printf(__VA_ARGS__);                                              \
+		printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__); \
+	}
 #else
 #define LOG_ERROR(...)
 #endif

@@ -36,7 +36,7 @@
 
 #include <string.h>
 
-bool rawGetAvailableVulkanExtensions(
+bool rawGetAvailableVulkanInstanceExtensions(
 	VkExtensionProperties** available_extensions,
 	uint32_t* n_extensions) {
 
@@ -53,10 +53,9 @@ bool rawGetAvailableVulkanExtensions(
 		*n_extensions * sizeof(VkExtensionProperties));
 
 	if (!*available_extensions) {
-		RAW_MEM_FREE(*available_extensions);
-		*available_extensions = RAW_NULL_PTR;
-
 		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on rawGetAvailableExtensions!");
+
+		RAW_MEM_FREE(*available_extensions);
 
 		return false;
 	}
@@ -65,10 +64,9 @@ bool rawGetAvailableVulkanExtensions(
 		RAW_NULL_PTR, n_extensions, *available_extensions);
 
 	if (result != VK_SUCCESS) {
-		RAW_MEM_FREE(*available_extensions);
-		*available_extensions = RAW_NULL_PTR;
-
 		RAW_LOG_ERROR("vkEnumerateInstanceExtensionProperties failed!");
+
+		RAW_MEM_FREE(*available_extensions);
 
 		return false;
 	}
@@ -78,9 +76,9 @@ bool rawGetAvailableVulkanExtensions(
 
 bool rawCreateVulkanInstance(
 	VkInstance* instance,
-	VkExtensionProperties* const available_extensions,
+	VkExtensionProperties const* const available_extensions,
 	uint32_t n_available_extensions,
-	char const* const* desired_extensions,
+	char const* const* const desired_extensions,
 	uint32_t n_desired_extensions,
 	char const* const application_name,
 	uint32_t application_version) {
@@ -144,5 +142,8 @@ void rawDestroyVulkanInstance(VkInstance* instance) {
 		vkDestroyInstance(*instance, RAW_NULL_PTR);
 		*instance = VK_NULL_HANDLE;
 	}
+	else
+		RAW_LOG_WARNING("Attempting to destroy "
+			"NULL Vulkan instance!");
 }
 

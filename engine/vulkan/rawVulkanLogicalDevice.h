@@ -22,43 +22,47 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "engine/platform/rawMemory.h"
+/* Raw Rendering Engine - "engine/vulkan/rawVulkanLogicalDevice.h"
  *
- * Cross-platform memory allocation API
- *
- * TODO: Implement custom memory allocators
- * TODO: RAW_MEM_ALLOC receives 3 parameters:
- *           pointer, number of elements, size of one element
+ * Vulkan logical device related functions
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 16/03/2020
+ * Created: 19/03/2020
  * Last modified: 19/03/2020
  */
 
-#ifndef RAW_MEMORY_H
-#define RAW_MEMORY_H
+#ifndef RAW_VULKAN_LOGICAL_DEVICE_H
+#define RAW_VULKAN_LOGICAL_DEVICE_H
 
-#include <engine/platform/rawPlatform.h>
-#include <engine/utils/rawLogger.h>
+#include <engine/vulkan/rawVulkan.h>
+#include <engine/vulkan/rawVulkanPhysicalDevice.h>
 
 #include <inttypes.h>
+#include <stdbool.h>
 
-void rawMemAlloc(void** ptr, uint64_t size);
-void rawMemFree(void* ptr);
+/*
+ * Creates a logical device for @physical_device
+ *
+ * It's the caller's responsibility to guarantee:
+ *     @physical_device supports all the extensions listed in
+ *     @device_extensions
+ *
+ *     @physical_device supports all the queues listed in
+ *     @device_queues
+ *
+ *     @device_features is taken from
+ *     @physical_device
+ */
+bool rawCreateVulkanLogicalDevice(
+	VkPhysicalDevice physical_device,
+	VkDeviceQueueCreateInfo const* const device_queues,
+	uint32_t n_device_queues,
+	char const* const* device_extensions,
+	uint32_t n_device_extensions,
+	VkPhysicalDeviceFeatures* device_features,
+	VkDevice* logical_device);
 
-#define RAW_MEM_ALLOC(ptr, size)                \
-	{                                           \
-		RAW_LOG_TRACE("Allocating %" PRIu64     \
-			" bytes for pointer: " #ptr, size); \
-		rawMemAlloc((void**)&(ptr), (size));    \
-	}
+void rawDestroyVulkanLogicalDevice(VkDevice* logical_device);
 
-#define RAW_MEM_FREE(ptr)                        \
-	{                                            \
-		RAW_LOG_TRACE("Freeing pointer: " #ptr); \
-		rawMemFree((ptr));                       \
-		ptr = RAW_NULL_PTR;                      \
-	}
-
-#endif // RAW_MEMORY_H
+#endif // RAW_VULKAN_LOGICAL_DEVICE_H
 

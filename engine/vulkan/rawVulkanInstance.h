@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 18/03/2020
+ * Last modified: 19/03/2020
  */
 
 #ifndef RAW_VULKAN_INSTANCE_H
@@ -46,7 +46,7 @@
  * It's the caller's responsibility to free that
  * memory through a call to RAW_MEM_FREE
  */
-bool rawGetAvailableVulkanExtensions(
+bool rawGetAvailableVulkanInstanceExtensions(
 	VkExtensionProperties** available_extensions,
 	uint32_t* n_extensions);
 
@@ -56,9 +56,9 @@ bool rawGetAvailableVulkanExtensions(
  */
 bool rawCreateVulkanInstance(
 	VkInstance* instance,
-	VkExtensionProperties* const available_extensions,
+	VkExtensionProperties const* const available_extensions,
 	uint32_t n_available_extensions,
-	char const* const* desired_extensions,
+	char const* const* const desired_extensions,
 	uint32_t n_desired_extensions,
 	char const* const application_name,
 	uint32_t application_version);

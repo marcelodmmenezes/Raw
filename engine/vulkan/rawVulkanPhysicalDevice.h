@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 18/03/2020
+ * Last modified: 19/03/2020
  */
 
 #ifndef RAW_VULKAN_PHYSICAL_DEVICE_H
@@ -45,7 +45,7 @@
  * It's the caller's responsibility to free that
  * memory through a call to RAW_MEM_FREE
  */
-bool rawGetPhysicalDevices(
+bool rawGetVulkanPhysicalDevices(
 	VkInstance instance,
 	VkPhysicalDevice** available_devices,
 	uint32_t* n_available_devices);
@@ -58,7 +58,7 @@ bool rawGetPhysicalDevices(
  * It's the caller's responsibility to free that
  * memory through a call to RAW_MEM_FREE
  */
-bool rawGetPhysicalDeviceCharacteristics(
+bool rawGetVulkanPhysicalDeviceCharacteristics(
 	VkPhysicalDevice physical_device,
 	VkExtensionProperties** available_extensions,
 	uint32_t* n_available_extensions,
@@ -72,12 +72,43 @@ bool rawGetPhysicalDeviceCharacteristics(
  * the desired capabilities will be stored in parameter
  *     @*queue_family_index
  */
-bool rawGetPhysicalDeviceQueueFamily(
+bool rawGetVulkanPhysicalDeviceQueueFamilyIndex(
 	VkPhysicalDevice physical_device,
-	VkQueueFamilyProperties* const queue_families,
+	VkQueueFamilyProperties const* const queue_families,
 	uint32_t n_queue_families,
 	VkQueueFlags desired_capabilities,
 	uint32_t* queue_family_index);
+
+/*
+ * If successful, an index to the first physical device
+ * in @available_devices that has the desired properties
+ * will be stored in parameter
+ *     @*physical_device_index
+ *
+ * If successful, the function will allocate memory for:
+ *     @*queue_priorities
+ *     @*queue_create_infos
+ *
+ * It's the caller's responsibility to free that
+ * memory through a call to RAW_MEM_FREE
+ *
+ * TODO: Better selection of physical device
+ * (consider device efficiency, for instance)
+ */
+bool rawSelectPhysicalDeviceWithDesiredCharacteristics(
+	VkPhysicalDevice const* const physical_devices,
+	uint32_t n_physical_devices,
+	char const* const* const desired_extensions,
+	uint32_t n_desired_extensions,
+	VkPhysicalDeviceFeatures* features,
+	VkPhysicalDeviceProperties* properties,
+	VkQueueFlags* const desired_queue_capabilities,
+	uint32_t n_desired_queue_capabilities,
+	float** queue_priorities,
+	uint32_t* n_queue_priorities,
+	VkDeviceQueueCreateInfo** queue_create_infos,
+	uint32_t* n_queue_create_infos,
+	uint32_t* physical_device_index);
 
 #endif // RAW_VULKAN_PHYSICAL_DEVICE_H
 
