@@ -22,72 +22,80 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "engine/platform/rawPlatform.c"
+/* Raw Rendering Engine - "engine/platform/windows/rawPlatform.c"
  *
  * Operating system abstraction API
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 18/03/2020
- * Last modified: 18/03/2020
+ * Created: 20/03/2020
+ * Last modified: 20/03/2020
  */
 
 #include <engine/platform/rawPlatform.h>
 
-///----------------------------------------------------------------------- LINUX
 #include <stdio.h>
 
 void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color) {
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+
 	switch (color) {
 		case RAW_PLATFORM_TERMINAL_COLOR_RED:
-			printf("\033[0;31m");
+			SetConsoleTextAttribute(console, FOREGROUND_RED);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_RED:
-			printf("\033[1;31m");
+			SetConsoleTextAttribute(console, BACKGROUND_RED);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_GREEN:
-			printf("\033[0;32m");
+			SetConsoleTextAttribute(console, FOREGROUND_GREEN);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_GREEN:
-			printf("\033[1;32m");
+			SetConsoleTextAttribute(console, BACKGROUND_GREEN);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_YELLOW:
-			printf("\033[0;33m");
+			SetConsoleTextAttribute(console,
+				FOREGROUND_RED | FOREGROUND_GREEN);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_YELLOW:
-			printf("\033[1;33m");
+			SetConsoleTextAttribute(console,
+				BACKGROUND_RED | BACKGROUND_GREEN);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_BLUE:
-			printf("\033[0;34m");
+			SetConsoleTextAttribute(console, FOREGROUND_BLUE);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_BLUE:
-			printf("\033[1;34m");
+			SetConsoleTextAttribute(console, BACKGROUND_BLUE);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_MAGENTA:
-			printf("\033[0;35m");
+			SetConsoleTextAttribute(console,
+				FOREGROUND_RED | FOREGROUND_BLUE);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_MAGENTA:
-			printf("\033[1;35m");
+			SetConsoleTextAttribute(console,
+				BACKGROUND_RED | BACKGROUND_BLUE);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_CYAN:
-			printf("\033[0;36m");
+			SetConsoleTextAttribute(console,
+				FOREGROUND_GREEN | FOREGROUND_BLUE);
 			break;
 
 		case RAW_PLATFORM_TERMINAL_COLOR_BOLD_CYAN:
-			printf("\033[1;36m");
+			SetConsoleTextAttribute(console,
+				BACKGROUND_GREEN | BACKGROUND_BLUE);
 			break;
 
 		default:
-			printf("\033[0m");
+			SetConsoleTextAttribute(console,
+				FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	}
 }
 

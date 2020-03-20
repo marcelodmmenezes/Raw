@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "engine/unitTests/rawLinuxXCB.c"
+/* Raw Rendering Engine - "engine/unitTests/rawWindows.c"
  *
- * Unit testing procedures
- * Linux, XCB
+ * Windows unit testing procedures
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 16/03/2020
+ * Created: 20/03/2020
  * Last modified: 20/03/2020
  */
 

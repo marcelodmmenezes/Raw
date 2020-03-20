@@ -22,27 +22,26 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "engine/unitTests/rawLinuxXCB.c"
+/* Raw Rendering Engine - "engine/platform/windows/rawMemory.c"
  *
- * Unit testing procedures
- * Linux, XCB
+ * Windows implementation for the memory allocation API
+ *
+ * TODO: Implement custom memory allocators
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 16/03/2020
+ * Created: 20/03/2020
  * Last modified: 20/03/2020
  */
 
-#include <unitTests/rawCrossPlatformTests.h>
+#include <engine/platform/rawMemory.h>
 
-int main() {
-	testLoggingLibrary();
-	testMemoryAllocation();
-	testVulkanLibraryLoading();
-	testVulkanInstanceCreationAndDestruction();
-	testVulkanPhysicalDeviceCreationAndDestruction();
-	testRawSelectPhysicalDeviceWithDesiredCharacteristics();
-	testVulkanLogicalDeviceCreationAndDestruction();
+#include <stdlib.h>
 
-	RAW_LOG_CMSG("All tests succeeded!\n", RAW_LOG_GREEN);
+void rawMemAlloc(void** ptr, uint64_t size) {
+	*ptr = malloc(size);
+}
+
+void rawMemFree(void* ptr) {
+	free(ptr);
 }
 

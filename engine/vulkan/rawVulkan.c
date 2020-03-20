@@ -35,7 +35,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 20/03/2020
  */
 
 #include <engine/vulkan/rawVulkan.h>
@@ -98,8 +98,16 @@ PFN_vkGetPhysicalDeviceSurfacePresentModesKHR
 	vkGetPhysicalDeviceSurfacePresentModesKHR;
 PFN_vkDestroySurfaceKHR
 	vkDestroySurfaceKHR;
+
+#if defined (RAW_PLATFORM_LINUX)
+#if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
 PFN_vkCreateXcbSurfaceKHR
 	vkCreateXcbSurfaceKHR;
+#endif
+#elif defined (RAW_PLATFORM_WINDOWS)
+PFN_vkCreateWin32SurfaceKHR
+	vkCreateWin32SurfaceKHR;
+#endif
 
 /*
  * Vulkan device level functions

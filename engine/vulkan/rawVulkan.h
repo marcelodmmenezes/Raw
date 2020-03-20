@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 18/03/2020
+ * Last modified: 20/03/2020
  */
 
 #ifndef RAW_VULKAN_H
@@ -159,6 +159,11 @@ extern PFN_vkDestroySurfaceKHR
 extern PFN_vkCreateXcbSurfaceKHR
 	vkCreateXcbSurfaceKHR;
 #endif
+#elif defined (RAW_PLATFORM_WINDOWS)
+#define vkCreateWin32SurfaceKHR \
+	rawVkCreateWin32SurfaceKHR
+extern PFN_vkCreateWin32SurfaceKHR
+	vkCreateWin32SurfaceKHR;
 #endif
 
 /*

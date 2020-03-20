@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 20/03/2020
  */
 
 #ifndef RAW_PLATFORM_H
@@ -58,11 +58,6 @@ typedef enum {
 #if defined (RAW_PLATFORM_LINUX)
 
 /*********************************
- ******** Terminal functionalities
- *********************************/
-void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
-
-/*********************************
  * Dynamic library functionalities
  *********************************/
 #include <dlfcn.h>
@@ -70,10 +65,16 @@ void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
 #define RAW_LOAD_LIBRARY_FUNCTION(library, function) \
 	dlsym(library, function)
 
-/********************************
- ************************* Vulkan
- ********************************/
-#define RAW_VULKAN_LIBRARY void*
+/*********************************
+ ******** Terminal functionalities
+ *********************************/
+void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
+
+/*********************************
+ ************************** Vulkan
+ *********************************/
+#define RAW_VULKAN_LIBRARY \
+ 	void*
 
 #define RAW_LOAD_VULKAN_LIBRARY(library)         \
 	library = dlopen("libvulkan.so.1", RTLD_NOW)
@@ -95,9 +96,29 @@ void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
 #endif
 #include <windows.h>
 
-// TODO: RAW_LOAD_VULKAN_LIBRARY, RAW_LOAD_LIBRARY_FUNCTION
+/*********************************
+ * Dynamic library functionalities
+ *********************************/
+#define RAW_LOAD_LIBRARY_FUNCTION(library, function) \
+	GetProcAddress(library, function)
 
-#define RAW_VULKAN_LIBRARY HMODULE
+/*********************************
+ ******** Terminal functionalities
+ *********************************/
+void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
+
+/*********************************
+ ************************** Vulkan
+ *********************************/
+#define RAW_VULKAN_LIBRARY \
+ 	HMODULE
+
+#define RAW_LOAD_VULKAN_LIBRARY(library) \
+	library = LoadLibrary("vulkan-1.dll")
+
+#define RAW_RELEASE_VULKAN_LIBRARY(library) \
+	FreeLibrary(library)
+
 #define VK_USE_PLATFORM_WIN32_KHR
 
 #endif // Operating system switch
