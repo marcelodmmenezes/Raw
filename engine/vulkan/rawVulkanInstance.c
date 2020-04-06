@@ -28,13 +28,52 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 06/04/2020
  */
 
 #include <engine/vulkan/rawVulkanInstance.h>
 #include <engine/platform/rawMemory.h>
 
 #include <string.h>
+
+bool rawGetAvailableVulkanInstanceLayers(
+	VkLayerProperties** available_layers,
+	uint32_t* n_layers) {
+
+	VkResult result = vkEnumerateInstanceLayerProperties(
+		n_layers, RAW_NULL_PTR);
+
+	if (result != VK_SUCCESS) {
+		RAW_LOG_ERROR("vkEnumerateInstanceLayerProperties failed!");
+
+		return false;
+	}
+
+	RAW_MEM_ALLOC(*available_layers, (uint64_t)*n_layers,
+		sizeof(VkLayerProperties));
+
+	if (!*available_layers) {
+		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on "
+			"rawGetAvailableVulkanInstanceLayers");
+
+		RAW_MEM_FREE(*available_layers);
+
+		return false;
+	}
+
+	result = vkEnumerateInstanceLayerProperties(
+		n_layers, *available_layers);
+
+	if (result != VK_SUCCESS) {
+		RAW_LOG_ERROR("vkEnumerateInstanceLayerProperties failed!");
+
+		RAW_MEM_FREE(*available_layers);
+
+		return false;
+	}
+
+	return true;
+}
 
 bool rawGetAvailableVulkanInstanceExtensions(
 	VkExtensionProperties** available_extensions,
@@ -53,7 +92,8 @@ bool rawGetAvailableVulkanInstanceExtensions(
 		sizeof(VkExtensionProperties));
 
 	if (!*available_extensions) {
-		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on rawGetAvailableExtensions!");
+		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on "
+			"rawGetAvailableVulkanInstanceExtensions!");
 
 		RAW_MEM_FREE(*available_extensions);
 
@@ -76,6 +116,10 @@ bool rawGetAvailableVulkanInstanceExtensions(
 
 bool rawCreateVulkanInstance(
 	VkInstance* instance,
+	VkLayerProperties const* const available_layers,
+	uint32_t n_available_layers,
+	char const* const* const desired_layers,
+	uint32_t n_desired_layers,
 	VkExtensionProperties const* const available_extensions,
 	uint32_t n_available_extensions,
 	char const* const* const desired_extensions,
@@ -83,12 +127,32 @@ bool rawCreateVulkanInstance(
 	char const* const application_name,
 	uint32_t application_version) {
 
+	// Checking layers
+	for (uint32_t i = 0; i < n_desired_layers; ++i) {
+		bool available = false;
+
+		for (uint32_t j = 0; j < n_available_layers; ++j) {
+			if (strcmp(desired_layers[i],
+					available_layers[j].layerName) == 0) {
+				available = true;
+				break;
+			}
+		}
+
+		if (!available) {
+			RAW_LOG_ERROR("%s is not available!", desired_layers[i]);
+
+			return false;
+		}
+	}
+
+	// Checking extensions
 	for (uint32_t i = 0; i < n_desired_extensions; ++i) {
 		bool available = false;
 
 		for (uint32_t j = 0; j < n_available_extensions; ++j) {
-			if (strstr(desired_extensions[i],
-					available_extensions[j].extensionName)) {
+			if (strcmp(desired_extensions[i],
+					available_extensions[j].extensionName) == 0) {
 				available = true;
 				break;
 			}
@@ -111,14 +175,13 @@ bool rawCreateVulkanInstance(
 		.apiVersion = RAW_VULKAN_VERSION
 	};
 
-	// TODO: Enable debug layers
 	VkInstanceCreateInfo instance_create_info = {
 		.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 		.pNext = RAW_NULL_PTR,
 		.flags = 0,
 		.pApplicationInfo = &application_info,
-		.enabledLayerCount = 0,
-		.ppEnabledLayerNames = RAW_NULL_PTR,
+		.enabledLayerCount = n_desired_layers,
+		.ppEnabledLayerNames = desired_layers,
 		.enabledExtensionCount = n_desired_extensions,
 		.ppEnabledExtensionNames = desired_extensions
 	};

@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 06/04/2020
  */
 
 #ifndef RAW_VULKAN_INSTANCE_H
@@ -38,6 +38,17 @@
 
 #include <inttypes.h>
 #include <stdbool.h>
+
+/*
+ * If successful, the function will allocate memory for:
+ *     @*available_layers
+ *
+ * It's the caller's responsibility to free that
+ * memory through a call to RAW_MEM_FREE
+ */
+bool rawGetAvailableVulkanInstanceLayers(
+	VkLayerProperties** available_layers,
+	uint32_t* n_layers);
 
 /*
  * If successful, the function will allocate memory for:
@@ -56,6 +67,10 @@ bool rawGetAvailableVulkanInstanceExtensions(
  */
 bool rawCreateVulkanInstance(
 	VkInstance* instance,
+	VkLayerProperties const* const available_layers,
+	uint32_t n_available_layers,
+	char const* const* const desired_layers,
+	uint32_t n_desired_layers,
 	VkExtensionProperties const* const available_extensions,
 	uint32_t n_available_extensions,
 	char const* const* const desired_extensions,

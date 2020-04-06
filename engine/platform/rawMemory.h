@@ -30,7 +30,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 06/04/2020
  */
 
 #ifndef RAW_MEMORY_H
@@ -55,6 +55,8 @@ void rawMemFree(void* ptr);
 #define RAW_MEM_FREE(ptr)                        \
 	{                                            \
 		RAW_LOG_TRACE("Freeing pointer: " #ptr); \
+		if (!(ptr))                              \
+			RAW_LOG_WARNING(#ptr " is null!");   \
 		rawMemFree((ptr));                       \
 		ptr = RAW_NULL_PTR;                      \
 	}

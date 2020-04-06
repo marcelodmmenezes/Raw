@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 20/03/2020
- * Last modified: 20/03/2020
+ * Last modified: 06/04/2020
  */
 
 #ifndef RAW_CROSS_PLATFORM_TESTS
@@ -88,21 +88,44 @@ void testVulkanInstanceCreationAndDestruction() {
 	RAW_VULKAN_LIBRARY vulkan = RAW_NULL_PTR;
 	rawLoadVulkan(&vulkan);
 
+	VkLayerProperties* available_layers = RAW_NULL_PTR;
+	uint32_t n_available_layers;
+
+	bool result = rawGetAvailableVulkanInstanceLayers(
+		&available_layers, &n_available_layers);
+
+	RAW_ASSERT(result, "Vulkan layer enumeration failed!");
+
+	RAW_LOG_INFO("Available Vulkan instance layers:");
+
+	for (uint32_t i = 0; i < n_available_layers; ++i)
+		RAW_LOG_INFO(available_layers[i].layerName);
+
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
-	bool result = rawGetAvailableVulkanInstanceExtensions(
+	result = rawGetAvailableVulkanInstanceExtensions(
 		&available_extensions, &n_available_extensions);
 
 	RAW_ASSERT(result, "Vulkan extension enumeration failed!");
 
+	RAW_LOG_INFO("Available Vulkan instance extensions:");
+
+	for (uint32_t i = 0; i < n_available_extensions; ++i)
+		RAW_LOG_INFO(available_extensions[i].extensionName);
+
 	VkInstance instance = VK_NULL_HANDLE;
+
+	char const** desired_layers = RAW_NULL_PTR;
+	uint32_t n_desired_layers = 0;
 
 	char const** desired_extensions = RAW_NULL_PTR;
 	uint32_t n_desired_extensions = 0;
 
-	result = rawCreateVulkanInstance(&instance, available_extensions,
-		n_available_extensions, desired_extensions, n_desired_extensions,
+	result = rawCreateVulkanInstance(&instance, available_layers,
+		n_available_layers, desired_layers, n_desired_layers,
+		available_extensions, n_available_extensions,
+		desired_extensions, n_desired_extensions,
 		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
 
 	RAW_ASSERT(result, "Vulkan instance creation failed!");
@@ -119,6 +142,7 @@ void testVulkanInstanceCreationAndDestruction() {
 		"Vulkan instance destruction failed!");
 
 	RAW_MEM_FREE(available_extensions);
+	RAW_MEM_FREE(available_layers);
 
 	rawReleaseVulkan(&vulkan);
 
@@ -133,6 +157,12 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 	rawLoadVulkan(&vulkan);
 
 	// Instance creation
+	VkLayerProperties* available_layers = RAW_NULL_PTR;
+	uint32_t n_available_layers;
+
+	rawGetAvailableVulkanInstanceLayers(
+		&available_layers, &n_available_layers);
+
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
@@ -141,11 +171,16 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 
 	VkInstance instance = VK_NULL_HANDLE;
 
+	char const** desired_layers = RAW_NULL_PTR;
+	uint32_t n_desired_layers = 0;
+
 	char const** desired_extensions = RAW_NULL_PTR;
 	uint32_t n_desired_extensions = 0;
 
-	rawCreateVulkanInstance(&instance, available_extensions,
-		n_available_extensions, desired_extensions, n_desired_extensions,
+	rawCreateVulkanInstance(&instance, available_layers,
+		n_available_layers, desired_layers, n_desired_layers,
+		available_extensions, n_available_extensions,
+		desired_extensions, n_desired_extensions,
 		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
 
 	rawLoadVulkanInstanceLevelFunctions(
@@ -195,6 +230,7 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 	rawDestroyVulkanInstance(&instance);
 
 	RAW_MEM_FREE(available_extensions);
+	RAW_MEM_FREE(available_layers);
 
 	rawReleaseVulkan(&vulkan);
 
@@ -209,6 +245,12 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 	rawLoadVulkan(&vulkan);
 
 	// Instance creation
+	VkLayerProperties* available_layers = RAW_NULL_PTR;
+	uint32_t n_available_layers;
+
+	rawGetAvailableVulkanInstanceLayers(
+		&available_layers, &n_available_layers);
+
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
@@ -217,11 +259,16 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 
 	VkInstance instance = VK_NULL_HANDLE;
 
+	char const** desired_layers = RAW_NULL_PTR;
+	uint32_t n_desired_layers = 0;
+
 	char const** desired_extensions = RAW_NULL_PTR;
 	uint32_t n_desired_extensions = 0;
 
-	rawCreateVulkanInstance(&instance, available_extensions,
-		n_available_extensions, desired_extensions, n_desired_extensions,
+	rawCreateVulkanInstance(&instance, available_layers,
+		n_available_layers, desired_layers, n_desired_layers,
+		available_extensions, n_available_extensions,
+		desired_extensions, n_desired_extensions,
 		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
 
 	rawLoadVulkanInstanceLevelFunctions(
@@ -271,6 +318,7 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 	rawDestroyVulkanInstance(&instance);
 
 	RAW_MEM_FREE(available_extensions);
+	RAW_MEM_FREE(available_layers);
 
 	rawReleaseVulkan(&vulkan);
 
@@ -285,6 +333,12 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 	rawLoadVulkan(&vulkan);
 
 	// Instance creation
+	VkLayerProperties* available_layers = RAW_NULL_PTR;
+	uint32_t n_available_layers;
+
+	rawGetAvailableVulkanInstanceLayers(
+		&available_layers, &n_available_layers);
+
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
@@ -293,11 +347,16 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 
 	VkInstance instance = VK_NULL_HANDLE;
 
+	char const** desired_layers = RAW_NULL_PTR;
+	uint32_t n_desired_layers = 0;
+
 	char const** instance_extensions = RAW_NULL_PTR;
 	uint32_t n_desired_extensions = 0;
 
-	rawCreateVulkanInstance(&instance, available_extensions,
-		n_available_extensions, instance_extensions, n_desired_extensions,
+	rawCreateVulkanInstance(&instance, available_layers,
+		n_available_layers, desired_layers, n_desired_layers,
+		available_extensions, n_available_extensions,
+		instance_extensions, n_desired_extensions,
 		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
 
 	rawLoadVulkanInstanceLevelFunctions(
@@ -366,6 +425,7 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 	rawDestroyVulkanInstance(&instance);
 
 	RAW_MEM_FREE(available_extensions);
+	RAW_MEM_FREE(available_layers);
 
 	rawReleaseVulkan(&vulkan);
 
