@@ -29,7 +29,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 20/03/2020
+ * Last modified: 06/04/2020
  */
 
 #include <unitTests/rawCrossPlatformTests.h>
@@ -43,6 +43,6 @@ int main() {
 	testRawSelectPhysicalDeviceWithDesiredCharacteristics();
 	testVulkanLogicalDeviceCreationAndDestruction();
 
-	RAW_LOG_CMSG("All tests succeeded!\n", RAW_LOG_GREEN);
+	RAW_LOG_CMSG(RAW_LOG_GREEN, "All tests succeeded!\n");
 }
 

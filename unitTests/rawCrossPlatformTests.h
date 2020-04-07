@@ -44,20 +44,20 @@
 
 // Not exactly a unit test but useful anyways
 void testLoggingLibrary() {
-	RAW_LOG_CMSG("Running logging test...\n", RAW_LOG_BLUE);
+	RAW_LOG_CMSG(RAW_LOG_BLUE, "Running logging test...\n");
 
 	RAW_LOG_MSG("RAW_LOG_MSG\n");
-	RAW_LOG_CMSG("RAW_LOG_CMSG\n", RAW_LOG_CYAN);
+	RAW_LOG_CMSG(RAW_LOG_CYAN, "RAW_LOG_CMSG\n");
 	RAW_LOG_TRACE("RAW_LOG_TRACE %d", 1);
 	RAW_LOG_INFO("RAW_LOG_INFO %d", 2);
 	RAW_LOG_WARNING("RAW_LOG_WARNING %d", 3);
 	RAW_LOG_ERROR("RAW_LOG_ERROR %d", 4);
 
-	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+	RAW_LOG_CMSG(RAW_LOG_GREEN, "Test succeeded!\n\n");
 }
 
 void testMemoryAllocation() {
-	RAW_LOG_CMSG("Running memory allocation test...\n", RAW_LOG_BLUE);
+	RAW_LOG_CMSG(RAW_LOG_BLUE, "Running memory allocation test...\n");
 
 	void* ptr;
 	RAW_MEM_ALLOC(ptr, 4294967296, 1);
@@ -65,11 +65,11 @@ void testMemoryAllocation() {
 
 	RAW_MEM_FREE(ptr);
 
-	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+	RAW_LOG_CMSG(RAW_LOG_GREEN, "Test succeeded!\n\n");
 }
 
 void testVulkanLibraryLoading() {
-	RAW_LOG_CMSG("Running Vulkan library loading test...\n", RAW_LOG_BLUE);
+	RAW_LOG_CMSG(RAW_LOG_BLUE, "Running Vulkan library loading test...\n");
 
 	RAW_VULKAN_LIBRARY vulkan = RAW_NULL_PTR;
 
@@ -79,11 +79,11 @@ void testVulkanLibraryLoading() {
 
 	rawReleaseVulkan(&vulkan);
 
-	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+	RAW_LOG_CMSG(RAW_LOG_GREEN, "Test succeeded!\n\n");
 }
 
 void testVulkanInstanceCreationAndDestruction() {
-	RAW_LOG_CMSG("Running Vulkan instance creation test...\n", RAW_LOG_BLUE);
+	RAW_LOG_CMSG(RAW_LOG_BLUE, "Running Vulkan instance creation test...\n");
 
 	RAW_VULKAN_LIBRARY vulkan = RAW_NULL_PTR;
 	rawLoadVulkan(&vulkan);
@@ -96,10 +96,10 @@ void testVulkanInstanceCreationAndDestruction() {
 
 	RAW_ASSERT(result, "Vulkan layer enumeration failed!");
 
-	RAW_LOG_INFO("Available Vulkan instance layers:");
+	RAW_LOG_CMSG(RAW_LOG_MAGENTA, "\n\tAvailable Vulkan instance layers:\n");
 
 	for (uint32_t i = 0; i < n_available_layers; ++i)
-		RAW_LOG_INFO(available_layers[i].layerName);
+		RAW_LOG_CMSG(RAW_LOG_CYAN, "\t%s\n", available_layers[i].layerName);
 
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
@@ -109,13 +109,16 @@ void testVulkanInstanceCreationAndDestruction() {
 
 	RAW_ASSERT(result, "Vulkan extension enumeration failed!");
 
-	RAW_LOG_INFO("Available Vulkan instance extensions:");
+	RAW_LOG_CMSG(RAW_LOG_MAGENTA,
+		"\n\tAvailable Vulkan instance extensions:\n");
 
 	for (uint32_t i = 0; i < n_available_extensions; ++i)
-		RAW_LOG_INFO(available_extensions[i].extensionName);
+		RAW_LOG_CMSG(RAW_LOG_CYAN, "\t%s\n",
+			available_extensions[i].extensionName);
 
 	VkInstance instance = VK_NULL_HANDLE;
 
+	// Testing with 0 layers and 0 extensions
 	char const** desired_layers = RAW_NULL_PTR;
 	uint32_t n_desired_layers = 0;
 
@@ -146,12 +149,12 @@ void testVulkanInstanceCreationAndDestruction() {
 
 	rawReleaseVulkan(&vulkan);
 
-	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+	RAW_LOG_CMSG(RAW_LOG_GREEN, "Test succeeded!\n\n");
 }
 
 void testVulkanPhysicalDeviceCreationAndDestruction() {
-	RAW_LOG_CMSG("Running Vulkan physical device "
-		"creation test...\n", RAW_LOG_BLUE);
+	RAW_LOG_CMSG(RAW_LOG_BLUE,
+		"Running Vulkan physical device " "creation test...\n");
 
 	RAW_VULKAN_LIBRARY vulkan = RAW_NULL_PTR;
 	rawLoadVulkan(&vulkan);
@@ -160,28 +163,41 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 	VkLayerProperties* available_layers = RAW_NULL_PTR;
 	uint32_t n_available_layers;
 
-	rawGetAvailableVulkanInstanceLayers(
+	bool result = rawGetAvailableVulkanInstanceLayers(
 		&available_layers, &n_available_layers);
+
+	RAW_ASSERT(result, "Vulkan layer enumeration failed!");
 
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
-	rawGetAvailableVulkanInstanceExtensions(
+	result = rawGetAvailableVulkanInstanceExtensions(
 		&available_extensions, &n_available_extensions);
+
+	RAW_ASSERT(result, "Vulkan extension enumeration failed!");
 
 	VkInstance instance = VK_NULL_HANDLE;
 
-	char const** desired_layers = RAW_NULL_PTR;
-	uint32_t n_desired_layers = 0;
+	// Testing with debug layers and debug extensions
+	char const* desired_layers[] = {
+		"VK_LAYER_KHRONOS_validation"
+	};
 
-	char const** desired_extensions = RAW_NULL_PTR;
-	uint32_t n_desired_extensions = 0;
+	uint32_t n_desired_layers = 1;
 
-	rawCreateVulkanInstance(&instance, available_layers,
+	char const* desired_extensions[] = {
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+	};
+
+	uint32_t n_desired_extensions = 1;
+
+	result = rawCreateVulkanInstance(&instance, available_layers,
 		n_available_layers, desired_layers, n_desired_layers,
 		available_extensions, n_available_extensions,
 		desired_extensions, n_desired_extensions,
 		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+
+	RAW_ASSERT(result, "Vulkan instance creation failed!");
 
 	rawLoadVulkanInstanceLevelFunctions(
 		instance, desired_extensions, n_desired_extensions);
@@ -190,7 +206,7 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
 	uint32_t n_physical_devices;
 
-	bool result = rawGetVulkanPhysicalDevices(
+	result = rawGetVulkanPhysicalDevices(
 		instance, &physical_devices, &n_physical_devices);
 
 	RAW_ASSERT(result, "rawGetPhysicalDevices failed!");
@@ -211,6 +227,13 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 			&queue_families, &n_queue_families);
 
 		RAW_ASSERT(result, "rawGetPhysicalDeviceCharacteristics failed!");
+
+		RAW_LOG_CMSG(RAW_LOG_MAGENTA,
+			"\n\tPhysical device %d available extensions:\n", i);
+
+		for (uint32_t j = 0; j < n_device_extensions; ++j)
+			RAW_LOG_CMSG(RAW_LOG_CYAN, "\t%s\n",
+				device_extensions[j].extensionName);
 
 		uint32_t queue_family_index;
 
@@ -234,12 +257,12 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 
 	rawReleaseVulkan(&vulkan);
 
-	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+	RAW_LOG_CMSG(RAW_LOG_GREEN, "Test succeeded!\n\n");
 }
 
 void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
-	RAW_LOG_CMSG("Running RAW Vulkan physical device "
-		"selection test...\n", RAW_LOG_BLUE);
+	RAW_LOG_CMSG(RAW_LOG_BLUE,
+		"Running RAW Vulkan physical device selection test...\n");
 
 	RAW_VULKAN_LIBRARY vulkan = RAW_NULL_PTR;
 	rawLoadVulkan(&vulkan);
@@ -248,22 +271,33 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 	VkLayerProperties* available_layers = RAW_NULL_PTR;
 	uint32_t n_available_layers;
 
-	rawGetAvailableVulkanInstanceLayers(
+	bool result = rawGetAvailableVulkanInstanceLayers(
 		&available_layers, &n_available_layers);
+
+	RAW_ASSERT(result, "Vulkan layer enumeration failed!");
 
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
-	rawGetAvailableVulkanInstanceExtensions(
+	result = rawGetAvailableVulkanInstanceExtensions(
 		&available_extensions, &n_available_extensions);
+
+	RAW_ASSERT(result, "Vulkan extension enumeration failed!");
 
 	VkInstance instance = VK_NULL_HANDLE;
 
-	char const** desired_layers = RAW_NULL_PTR;
-	uint32_t n_desired_layers = 0;
+	// Testing with debug layers and debug extensions
+	char const* desired_layers[] = {
+		"VK_LAYER_KHRONOS_validation"
+	};
 
-	char const** desired_extensions = RAW_NULL_PTR;
-	uint32_t n_desired_extensions = 0;
+	uint32_t n_desired_layers = 1;
+
+	char const* desired_extensions[] = {
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+	};
+
+	uint32_t n_desired_extensions = 1;
 
 	rawCreateVulkanInstance(&instance, available_layers,
 		n_available_layers, desired_layers, n_desired_layers,
@@ -273,7 +307,7 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 
 	rawLoadVulkanInstanceLevelFunctions(
 		instance, desired_extensions, n_desired_extensions);
-	
+
 	// Physical device creation
 	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
 	uint32_t n_physical_devices;
@@ -288,15 +322,15 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 	VkQueueFlags* desired_queue_capabilities = RAW_NULL_PTR;
 	uint32_t n_desired_queue_capabilities = 0;
 
-	float* queue_priorities = RAW_NULL_PTR;
+	float* queue_priorities;
 	uint32_t n_queue_priorities;
 
-	VkDeviceQueueCreateInfo* queue_create_infos = RAW_NULL_PTR;
+	VkDeviceQueueCreateInfo* queue_create_infos;
 	uint32_t n_queue_create_infos;
 
 	uint32_t physical_device_index;
 
-	bool result = rawSelectPhysicalDeviceWithDesiredCharacteristics(
+	result = rawSelectPhysicalDeviceWithDesiredCharacteristics(
 		physical_devices, n_physical_devices,
 		desired_extensions, n_desired_extensions,
 		&features, &properties,
@@ -322,12 +356,12 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 
 	rawReleaseVulkan(&vulkan);
 
-	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+	RAW_LOG_CMSG(RAW_LOG_GREEN, "Test succeeded!\n\n");
 }
 
 void testVulkanLogicalDeviceCreationAndDestruction() {
-	RAW_LOG_CMSG("Running RAW Vulkan logical device "
-		"creation test...\n", RAW_LOG_BLUE);
+	RAW_LOG_CMSG(RAW_LOG_BLUE,
+		"Running RAW Vulkan logical device creation test...\n");
 
 	RAW_VULKAN_LIBRARY vulkan = RAW_NULL_PTR;
 	rawLoadVulkan(&vulkan);
@@ -336,32 +370,43 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 	VkLayerProperties* available_layers = RAW_NULL_PTR;
 	uint32_t n_available_layers;
 
-	rawGetAvailableVulkanInstanceLayers(
+	bool result = rawGetAvailableVulkanInstanceLayers(
 		&available_layers, &n_available_layers);
+
+	RAW_ASSERT(result, "Vulkan layer enumeration failed!");
 
 	VkExtensionProperties* available_extensions = RAW_NULL_PTR;
 	uint32_t n_available_extensions;
 
-	rawGetAvailableVulkanInstanceExtensions(
+	result = rawGetAvailableVulkanInstanceExtensions(
 		&available_extensions, &n_available_extensions);
+
+	RAW_ASSERT(result, "Vulkan extension enumeration failed!");
 
 	VkInstance instance = VK_NULL_HANDLE;
 
-	char const** desired_layers = RAW_NULL_PTR;
-	uint32_t n_desired_layers = 0;
+	// Testing with debug layers and debug extensions
+	char const* desired_layers[1] = {
+		"VK_LAYER_KHRONOS_validation"
+	};
 
-	char const** instance_extensions = RAW_NULL_PTR;
-	uint32_t n_desired_extensions = 0;
+	uint32_t n_desired_layers = 1;
+
+	char const* desired_extensions[] = {
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+	};
+
+	uint32_t n_desired_extensions = 1;
 
 	rawCreateVulkanInstance(&instance, available_layers,
 		n_available_layers, desired_layers, n_desired_layers,
 		available_extensions, n_available_extensions,
-		instance_extensions, n_desired_extensions,
+		desired_extensions, n_desired_extensions,
 		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
 
 	rawLoadVulkanInstanceLevelFunctions(
-		instance, instance_extensions, n_desired_extensions);
-	
+		instance, desired_extensions, n_desired_extensions);
+
 	// Physical device creation and selection
 	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
 	uint32_t n_physical_devices;
@@ -404,9 +449,10 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 	// Logical device creation
 	VkDevice logical_device;
 
-	bool result = rawCreateVulkanLogicalDevice(
+	result = rawCreateVulkanLogicalDevice(
 		physical_devices[physical_device_index],
 		queue_create_infos, n_queue_create_infos,
+		desired_layers, n_desired_layers,
 		device_extensions, n_desired_extensions,
 		&features, &logical_device);
 
@@ -429,7 +475,7 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 
 	rawReleaseVulkan(&vulkan);
 
-	RAW_LOG_CMSG("Test succeeded!\n\n", RAW_LOG_GREEN);
+	RAW_LOG_CMSG(RAW_LOG_GREEN, "Test succeeded!\n\n");
 }
 
 #endif // RAW_CROSS_PLATFORM_TESTS

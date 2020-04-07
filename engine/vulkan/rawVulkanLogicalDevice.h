@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 19/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 06/04/2020
  */
 
 #ifndef RAW_VULKAN_LOGICAL_DEVICE_H
@@ -57,6 +57,8 @@ bool rawCreateVulkanLogicalDevice(
 	VkPhysicalDevice physical_device,
 	VkDeviceQueueCreateInfo const* const device_queues,
 	uint32_t n_device_queues,
+	char const* const* layers,
+	uint32_t n_layers,
 	char const* const* device_extensions,
 	uint32_t n_device_extensions,
 	VkPhysicalDeviceFeatures* device_features,

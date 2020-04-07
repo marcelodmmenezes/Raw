@@ -29,7 +29,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 06/04/2020
  */
 
 #ifndef RAW_LOG_H
@@ -54,16 +54,16 @@
 #define RAW_LOG_DEFAULT RAW_PLATFORM_TERMINAL_COLOR_DEFAULT
 
 #if defined (RAW_ENABLE_LOG_MSG)
-#define RAW_LOG_MSG(msg)                                 \
+#define RAW_LOG_MSG(...)                                 \
 	{                                                    \
 		rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT); \
-		printf(msg);                                     \
+		printf(__VA_ARGS__);                             \
 	}
 
-#define RAW_LOG_CMSG(msg, color)                         \
+#define RAW_LOG_CMSG(color, ...)                         \
 	{                                                    \
 		rawPlatformSwitchTerminalColor(color);           \
-		printf(msg);                                     \
+		printf(__VA_ARGS__);                             \
 		rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT); \
 	}
 #else

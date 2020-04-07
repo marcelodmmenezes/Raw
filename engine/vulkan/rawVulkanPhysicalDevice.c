@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 06/04/2020
  */
 
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
@@ -198,17 +198,14 @@ bool rawSelectPhysicalDeviceWithDesiredCharacteristics(
 			&device_extensions, &n_device_extensions,
 			features, properties,
 			&queue_families, &n_queue_families)) {
-			if (i < n_physical_devices - 1) {
-				RAW_LOG_INFO("rawGetVulkanPhysicalDeviceCharacteristics "
-					"failed for physical device %d!", i);
-
+			RAW_LOG_WARNING("rawGetVulkanPhysicalDeviceCharacteristics "
+				"failed for physical device %d!", i);
+			if (i < n_physical_devices - 1)
 				continue;
-			}
 			else {
 				RAW_LOG_ERROR(
 					"rawSelectPhysicalDeviceWithDesiredCharacteristics "
-					"failed on rawGetVulkanPhysicalDeviceCharacteristics for "
-					"physical device %d!", i);
+					"failed on rawGetVulkanPhysicalDeviceCharacteristics");
 
 				return false;
 			}
@@ -302,17 +299,19 @@ bool rawSelectPhysicalDeviceWithDesiredCharacteristics(
 			}
 
 			// Selecting necessary queues for logical device creation
-			for (uint32_t j = 0; j < n_queue_families; ++j) {
-				for (uint32_t k = 0; k < *n_queue_create_infos; ++k) {
-					(*queue_create_infos)[k].sType =
+			for (uint32_t j = 0, it = 0; j < n_queue_families; ++j) {
+				if (n_queues_per_queue_family[j] > 0) {
+					(*queue_create_infos)[it].sType =
 						VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-					(*queue_create_infos)[k].pNext = RAW_NULL_PTR;
-					(*queue_create_infos)[k].flags = 0;
-					(*queue_create_infos)[k].queueFamilyIndex = j;
-					(*queue_create_infos)[k].queueCount =
+					(*queue_create_infos)[it].pNext = RAW_NULL_PTR;
+					(*queue_create_infos)[it].flags = 0;
+					(*queue_create_infos)[it].queueFamilyIndex = j;
+					(*queue_create_infos)[it].queueCount =
 						n_queues_per_queue_family[j];
-					(*queue_create_infos)[k].pQueuePriorities =
+					(*queue_create_infos)[it].pQueuePriorities =
 						*queue_priorities;
+
+					++it;
 				}
 			}
 
