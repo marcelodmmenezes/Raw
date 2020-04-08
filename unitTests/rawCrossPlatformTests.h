@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 20/03/2020
- * Last modified: 06/04/2020
+ * Last modified: 08/04/2020
  */
 
 #ifndef RAW_CROSS_PLATFORM_TESTS
@@ -330,7 +330,7 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 
 	uint32_t physical_device_index;
 
-	result = rawSelectPhysicalDeviceWithDesiredCharacteristics(
+	result = rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 		physical_devices, n_physical_devices,
 		desired_extensions, n_desired_extensions,
 		&features, &properties,
@@ -435,7 +435,7 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 
 	uint32_t physical_device_index;
 
-	rawSelectPhysicalDeviceWithDesiredCharacteristics(
+	rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 		physical_devices, n_physical_devices,
 		device_extensions, n_desired_extensions,
 		&features, &properties,

@@ -28,11 +28,12 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 06/04/2020
+ * Last modified: 08/04/2020
  */
 
 #include <engine/vulkan/rawVulkanInstance.h>
 #include <engine/platform/rawMemory.h>
+#include <engine/utils/rawLogger.h>
 
 #include <string.h>
 

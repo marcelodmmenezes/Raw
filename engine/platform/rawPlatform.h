@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 20/03/2020
+ * Last modified: 08/04/2020
  */
 
 #ifndef RAW_PLATFORM_H
@@ -84,8 +84,19 @@ void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
 
 #if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
 #define VK_USE_PLATFORM_XCB_KHR
+#define RAW_VULKAN_SURFACE_CREATE_INFO \
+	VkXcbSurfaceCreateInfoKHR
+#define RAW_VULKAN_SURFACE_CREATE_INFO_TYPE \
+	VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR
+#define RAW_VULKAN_SURFACE_DISPLAY xcb_connection_t*
+#define RAW_VULKAN_SURFACE_CREATION_PLATFORM_PARAMETER_1 connection
+#define RAW_VULKAN_SURFACE_WINDOW xcb_window_t
+#define RAW_VULKAN_SURFACE_CREATION_PLATFORM_PARAMETER_2 window
+#define RAW_VULKAN_CREATE_SURFACE(...) \
+	vkCreateXcbSurfaceKHR(__VA_ARGS__)
 #elif defined (RAW_PLATFORM_XLIB_WINDOW_SYSTEM)
 #define VK_USE_PLATFORM_XLIB_KHR
+// TODO: xlib surface creation type
 #endif
 
 ///--------------------------------------------------------------------- WINDOWS
@@ -120,6 +131,7 @@ void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
 	FreeLibrary(library)
 
 #define VK_USE_PLATFORM_WIN32_KHR
+// TODO: win32 surface creation type
 
 #endif // Operating system switch
 

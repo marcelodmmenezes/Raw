@@ -22,63 +22,42 @@
  * SOFTWARE.
  */
 
-/* Raw Rendering Engine - "engine/vulkan/rawVulkanLogicalDevice.h"
+/* Raw Rendering Engine - "engine/vulkan/rawVulkanPresentation.h"
  *
  * Vulkan logical device related functions
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 19/03/2020
+ * Created: 08/06/2020
  * Last modified: 08/04/2020
  */
 
-#include <engine/vulkan/rawVulkanLogicalDevice.h>
+#include <engine/vulkan/rawVulkanPresentation.h>
 #include <engine/utils/rawLogger.h>
 
-bool rawCreateVulkanLogicalDevice(
-	VkPhysicalDevice physical_device,
-	VkDeviceQueueCreateInfo const* const device_queues,
-	uint32_t n_device_queues,
-	char const* const* layers,
-	uint32_t n_layers,
-	char const* const* device_extensions,
-	uint32_t n_device_extensions,
-	VkPhysicalDeviceFeatures* device_features,
-	VkDevice* logical_device) {
+bool rawCreateVulkanPresentationSurface(
+	VkInstance instance,
+	RAW_VULKAN_SURFACE_DISPLAY display,
+	RAW_VULKAN_SURFACE_WINDOW window,
+	VkSurfaceKHR* presentation_surface) {
 
-	VkDeviceCreateInfo device_create_info = {
-		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+	RAW_VULKAN_SURFACE_CREATE_INFO surface_create_info = {
+		.sType = RAW_VULKAN_SURFACE_CREATE_INFO_TYPE,
 		.pNext = RAW_NULL_PTR,
 		.flags = 0,
-		.queueCreateInfoCount = n_device_queues,
-		.pQueueCreateInfos = device_queues,
-		.enabledLayerCount = n_layers,
-		.ppEnabledLayerNames = layers,
-		.enabledExtensionCount = n_device_extensions,
-		.ppEnabledExtensionNames = device_extensions,
-		.pEnabledFeatures = device_features
+		.RAW_VULKAN_SURFACE_CREATION_PLATFORM_PARAMETER_1 = display,
+		.RAW_VULKAN_SURFACE_CREATION_PLATFORM_PARAMETER_2 = window
 	};
 
 	// TODO: Pass allocation callback
-	VkResult result = vkCreateDevice(physical_device,
-		&device_create_info, RAW_NULL_PTR, logical_device);
+	VkResult = RAW_VULKAN_CREATE_SURFACE(instance, &surface_create_info,
+		RAW_NULL_PTR, presentation_surface);
 
-	if ((result != VK_SUCCESS) || (*logical_device == VK_NULL_HANDLE)) {
-		RAW_LOG_ERROR("Vulkan logical device creation failed!");
+	if ((result != VK_SUCCESS) || (*presentation_surface == VK_NULL_HANDLE)) {
+		RAW_LOG_ERROR("Vulkan presentation surface creation failed!");
 
 		return false;
 	}
 
 	return true;
-}
-
-void rawDestroyVulkanLogicalDevice(VkDevice* logical_device) {
-	if (*logical_device) {
-		// TODO: Pass allocation callback
-		vkDestroyDevice(*logical_device, RAW_NULL_PTR);
-		logical_device = VK_NULL_HANDLE;
-	}
-	else
-		RAW_LOG_WARNING("Attempting to destroy "
-			"NULL Vulkan logical device!");
 }
 

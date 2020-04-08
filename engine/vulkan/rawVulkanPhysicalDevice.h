@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 19/03/2020
+ * Last modified: 08/04/2020
  */
 
 #ifndef RAW_VULKAN_PHYSICAL_DEVICE_H
@@ -95,7 +95,7 @@ bool rawGetVulkanPhysicalDeviceQueueFamilyIndex(
  * TODO: Better selection of physical device
  * (consider device efficiency, for instance)
  */
-bool rawSelectPhysicalDeviceWithDesiredCharacteristics(
+bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 	VkPhysicalDevice const* const physical_devices,
 	uint32_t n_physical_devices,
 	char const* const* const desired_extensions,

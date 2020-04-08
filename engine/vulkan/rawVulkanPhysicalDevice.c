@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 06/04/2020
+ * Last modified: 08/04/2020
  */
 
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
@@ -171,7 +171,7 @@ bool rawGetVulkanPhysicalDeviceQueueFamilyIndex(
 	return false;
 }
 
-bool rawSelectPhysicalDeviceWithDesiredCharacteristics(
+bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 	VkPhysicalDevice const* const physical_devices,
 	uint32_t n_physical_devices,
 	char const* const* const desired_extensions,
