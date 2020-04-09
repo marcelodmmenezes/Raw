@@ -84,6 +84,8 @@ void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
 
 #if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
 #define VK_USE_PLATFORM_XCB_KHR
+#define RAW_VULKAN_SURFACE_EXTENSION_NAME \
+	VK_KHR_XCB_SURFACE_EXTENSION_NAME
 #define RAW_VULKAN_SURFACE_CREATE_INFO \
 	VkXcbSurfaceCreateInfoKHR
 #define RAW_VULKAN_SURFACE_CREATE_INFO_TYPE \

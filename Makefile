@@ -29,7 +29,7 @@
 ##
 ## Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
 ## Created: 16/03/2020
-## Last modified: 20/03/2020
+## Last modified: 08/04/2020
 ##
 
 unitTestsXCB:
@@ -39,6 +39,7 @@ unitTestsXCB:
 	engine/vulkan/rawVulkanInstance.c                       \
 	engine/vulkan/rawVulkanPhysicalDevice.c                 \
 	engine/vulkan/rawVulkanLogicalDevice.c                  \
+	engine/vulkan/rawVulkanPresentation.c                   \
 	engine/platform/linux/rawPlatform.c                     \
 	engine/platform/linux/rawMemory.c                       \
 	-o build/unitTests/unitTestsXCB.out                     \
@@ -55,7 +56,8 @@ unitTestsXCB:
 	-D RAW_ENABLE_LOG_WARNING                               \
 	-D RAW_ENABLE_LOG_ERROR                                 \
 	-D RAW_BUILD_DEBUG                                      \
-	-ldl
+	-ldl                                                    \
+	-lxcb
 
 unitTestsWindows:
 	gcc -std=c11 -Wall                                      \

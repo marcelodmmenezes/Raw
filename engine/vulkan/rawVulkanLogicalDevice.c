@@ -75,7 +75,7 @@ void rawDestroyVulkanLogicalDevice(VkDevice* logical_device) {
 	if (*logical_device) {
 		// TODO: Pass allocation callback
 		vkDestroyDevice(*logical_device, RAW_NULL_PTR);
-		logical_device = VK_NULL_HANDLE;
+		*logical_device = VK_NULL_HANDLE;
 	}
 	else
 		RAW_LOG_WARNING("Attempting to destroy "

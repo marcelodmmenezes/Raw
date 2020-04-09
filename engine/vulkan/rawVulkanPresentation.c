@@ -49,7 +49,7 @@ bool rawCreateVulkanPresentationSurface(
 	};
 
 	// TODO: Pass allocation callback
-	VkResult = RAW_VULKAN_CREATE_SURFACE(instance, &surface_create_info,
+	VkResult result = RAW_VULKAN_CREATE_SURFACE(instance, &surface_create_info,
 		RAW_NULL_PTR, presentation_surface);
 
 	if ((result != VK_SUCCESS) || (*presentation_surface == VK_NULL_HANDLE)) {
@@ -59,5 +59,19 @@ bool rawCreateVulkanPresentationSurface(
 	}
 
 	return true;
+}
+
+void rawDestroyVulkanPresentationSurface(
+	VkInstance instance,
+	VkSurfaceKHR* presentation_surface) {
+
+	if (presentation_surface) {
+		// TODO: Pass allocation callback
+		vkDestroySurfaceKHR(instance, *presentation_surface, RAW_NULL_PTR);
+		*presentation_surface = VK_NULL_HANDLE;
+	}
+	else
+		RAW_LOG_WARNING("Attempting to destroy "
+			"NULL Vulkan presentation surface!");
 }
 

@@ -35,14 +35,23 @@
 #define RAW_VULKAN_PRESENTATION_H
 
 #include <engine/platform/rawPlatform.h>
+#include <engine/vulkan/rawVulkan.h>
 
 #include <inttypes.h>
 #include <stdbool.h>
 
+/*
+ * Creates Vulkan presentation surface
+ * according to the platform
+ */
 bool rawCreateVulkanPresentationSurface(
 	VkInstance instance,
 	RAW_VULKAN_SURFACE_DISPLAY display,
 	RAW_VULKAN_SURFACE_WINDOW window,
+	VkSurfaceKHR* presentation_surface);
+
+void rawDestroyVulkanPresentationSurface(
+	VkInstance instance,
 	VkSurfaceKHR* presentation_surface);
 
 #endif // RAW_VULKAN_PRESENTATION_H

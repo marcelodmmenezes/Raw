@@ -39,6 +39,7 @@
 #include <engine/vulkan/rawVulkanInstance.h>
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
 #include <engine/vulkan/rawVulkanLogicalDevice.h>
+#include <engine/vulkan/rawVulkanPresentation.h>
 #include <engine/utils/rawLogger.h>
 #include <engine/utils/rawAssert.h>
 
@@ -461,6 +462,7 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 	rawLoadVulkanDeviceLevelFunctions(logical_device,
 		device_extensions, n_desired_extensions);
 
+	// Logical device destruction
 	rawDestroyVulkanLogicalDevice(&logical_device);
 
 	RAW_MEM_FREE(queue_create_infos);
