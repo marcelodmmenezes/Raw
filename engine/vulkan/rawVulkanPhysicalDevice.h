@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 08/04/2020
+ * Last modified: 22/04/2020
  */
 
 #ifndef RAW_VULKAN_PHYSICAL_DEVICE_H
@@ -73,7 +73,6 @@ bool rawGetVulkanPhysicalDeviceCharacteristics(
  *     @*queue_family_index
  */
 bool rawGetVulkanPhysicalDeviceQueueFamilyIndex(
-	VkPhysicalDevice physical_device,
 	VkQueueFamilyProperties const* const queue_families,
 	uint32_t n_queue_families,
 	VkQueueFlags desired_capabilities,
@@ -84,6 +83,11 @@ bool rawGetVulkanPhysicalDeviceQueueFamilyIndex(
  * in @available_devices that has the desired properties
  * will be stored in parameter
  *     @*physical_device_index
+ *
+ * If presentation surface support is requested and the
+ * function is successful, an index to the presentation
+ * queue will be stored in parameter
+ *     @*presentation_queue_family_index
  *
  * If successful, the function will allocate memory for:
  *     @*queue_priorities
@@ -108,6 +112,8 @@ bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 	uint32_t* n_queue_priorities,
 	VkDeviceQueueCreateInfo** queue_create_infos,
 	uint32_t* n_queue_create_infos,
+	VkSurfaceKHR presentation_surface,
+	uint32_t* presentation_queue_family_index,
 	uint32_t* physical_device_index);
 
 #endif // RAW_VULKAN_PHYSICAL_DEVICE_H

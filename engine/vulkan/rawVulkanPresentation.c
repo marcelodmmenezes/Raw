@@ -27,8 +27,8 @@
  * Vulkan logical device related functions
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
- * Created: 08/06/2020
- * Last modified: 08/04/2020
+ * Created: 08/04/2020
+ * Last modified: 22/04/2020
  */
 
 #include <engine/vulkan/rawVulkanPresentation.h>

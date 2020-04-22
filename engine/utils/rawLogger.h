@@ -29,7 +29,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 06/04/2020
+ * Last modified: 08/04/2020
  */
 
 #ifndef RAW_LOG_H
@@ -58,6 +58,7 @@
 	{                                                    \
 		rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT); \
 		printf(__VA_ARGS__);                             \
+		fflush(stdout);                                  \
 	}
 
 #define RAW_LOG_CMSG(color, ...)                         \
@@ -65,6 +66,7 @@
 		rawPlatformSwitchTerminalColor(color);           \
 		printf(__VA_ARGS__);                             \
 		rawPlatformSwitchTerminalColor(RAW_LOG_DEFAULT); \
+		fflush(stdout);                                  \
 	}
 #else
 #define RAW_LOG_MSG(msg)
@@ -78,9 +80,10 @@
 		printf("\n\tTRACE:   ");                                          \
 		printf(__VA_ARGS__);                                              \
 		printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__); \
+		fflush(stdout);                                                   \
 	}
 #else
-#define LOG_TRACE(...)
+#define RAW_LOG_TRACE(...)
 #endif
 
 #if defined (RAW_ENABLE_LOG_INFO)
@@ -90,9 +93,10 @@
 		printf("\n\tINFO:    ");                                          \
 		printf(__VA_ARGS__);                                              \
 		printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__); \
+		fflush(stdout);                                                   \
 	}
 #else
-#define LOG_INFO(...)
+#define RAW_LOG_INFO(...)
 #endif
 
 #if defined (RAW_ENABLE_LOG_WARNING)
@@ -102,9 +106,10 @@
 		printf("\n\tWARNING: ");                                          \
 		printf(__VA_ARGS__);                                              \
 		printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__); \
+		fflush(stdout);                                                   \
 	}
 #else
-#define LOG_WARNING(...)
+#define RAW_LOG_WARNING(...)
 #endif
 
 #if defined (RAW_ENABLE_LOG_ERROR)
@@ -114,9 +119,10 @@
 		printf("\n\tERROR:   ");                                          \
 		printf(__VA_ARGS__);                                              \
 		printf("\n\t         FILE: %s | LINE: %d\n", __FILE__, __LINE__); \
+		fflush(stdout);                                                   \
 	}
 #else
-#define LOG_ERROR(...)
+#define RAW_LOG_ERROR(...)
 #endif
 
 #endif // RAW_LOG_H

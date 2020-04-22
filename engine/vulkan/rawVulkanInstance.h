@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 06/04/2020
+ * Last modified: 09/04/2020
  */
 
 #ifndef RAW_VULKAN_INSTANCE_H

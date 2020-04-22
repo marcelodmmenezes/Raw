@@ -28,12 +28,14 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 08/04/2020
+ * Last modified: 22/04/2020
  */
 
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
 #include <engine/platform/rawMemory.h>
 #include <engine/utils/rawLogger.h>
+
+#include <string.h>
 
 bool rawGetVulkanPhysicalDevices(
 	VkInstance instance,
@@ -101,8 +103,6 @@ bool rawGetVulkanPhysicalDeviceCharacteristics(
 		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on "
 			"rawGetPhysicalDeviceExtensions!");
 
-		RAW_MEM_FREE(*available_extensions);
-
 		return false;
 	}
 
@@ -136,6 +136,15 @@ bool rawGetVulkanPhysicalDeviceCharacteristics(
 	RAW_MEM_ALLOC(*queue_families, (uint64_t)*n_queue_families,
 		sizeof(VkQueueFamilyProperties));
 
+	if (!*queue_families) {
+		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on "
+			"rawGetPhysicalDeviceExtensions!");
+
+		RAW_MEM_FREE(*available_extensions);
+
+		return false;
+	}
+
 	vkGetPhysicalDeviceQueueFamilyProperties(
 		physical_device, n_queue_families, *queue_families);
 
@@ -153,7 +162,6 @@ bool rawGetVulkanPhysicalDeviceCharacteristics(
 }
 
 bool rawGetVulkanPhysicalDeviceQueueFamilyIndex(
-	VkPhysicalDevice physical_device,
 	VkQueueFamilyProperties const* const queue_families,
 	uint32_t n_queue_families,
 	VkQueueFlags desired_capabilities,
@@ -184,6 +192,8 @@ bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 	uint32_t* n_queue_priorities,
 	VkDeviceQueueCreateInfo** queue_create_infos,
 	uint32_t* n_queue_create_infos,
+	VkSurfaceKHR presentation_surface,
+	uint32_t* presentation_queue_family_index,
 	uint32_t* physical_device_index) {
 
 	for (uint32_t i = 0; i < n_physical_devices; ++i) {
@@ -194,12 +204,11 @@ bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 		uint32_t n_queue_families;
 
 		if (!rawGetVulkanPhysicalDeviceCharacteristics(
-			physical_devices[i],
-			&device_extensions, &n_device_extensions,
-			features, properties,
-			&queue_families, &n_queue_families)) {
+			physical_devices[i], &device_extensions, &n_device_extensions,
+			features, properties, &queue_families, &n_queue_families)) {
 			RAW_LOG_WARNING("rawGetVulkanPhysicalDeviceCharacteristics "
 				"failed for physical device %d!", i);
+
 			if (i < n_physical_devices - 1)
 				continue;
 			else {
@@ -208,6 +217,82 @@ bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 					"failed on rawGetVulkanPhysicalDeviceCharacteristics");
 
 				return false;
+			}
+		}
+
+		// Checking extensions
+		for (uint32_t i = 0; i < n_desired_extensions; ++i) {
+			bool available = false;
+
+			for (uint32_t j = 0; j < n_device_extensions; ++j) {
+				if (strcmp(desired_extensions[i],
+						device_extensions[j].extensionName) == 0) {
+					available = true;
+
+					break;
+				}
+			}
+
+			if (!available) {
+				RAW_LOG_INFO("Physical device %d does not support "
+					"extension %s!\n", i, desired_extensions[i]);
+
+				RAW_MEM_FREE(queue_families);
+				RAW_MEM_FREE(device_extensions);
+			
+				if (i < n_physical_devices - 1)
+					continue;
+				else {
+					RAW_LOG_ERROR("There is no physical device with "
+						"the required extensions!");
+
+					return false;
+				}
+			}
+		}
+
+		// Checking if the device supports the
+		// presentation surface in case it's requested
+		if (presentation_surface != VK_NULL_HANDLE) {
+			VkBool32 presentation_supported = VK_FALSE;
+
+			for (uint32_t j = 0; j < n_queue_families; ++j) {
+puts("A");fflush(stdout);
+				VkResult result = vkGetPhysicalDeviceSurfaceSupportKHR(
+					physical_devices[i], j, presentation_surface,
+					&presentation_supported);
+puts("B");fflush(stdout);
+
+				if (result != VK_SUCCESS)
+					RAW_LOG_WARNING("vkGetPhysicalDeviceSurfaceSupportKHR "
+						"failed for physical device %d, queue family %d!",
+						i, j);
+
+				if (presentation_supported == VK_TRUE) {
+					RAW_LOG_INFO("Physical device %d supports presentation "
+						"surface on queue family %d", i, j);
+
+					*presentation_queue_family_index = j;
+
+					break;
+				}
+			}
+
+			if (presentation_supported == VK_FALSE) {
+				RAW_LOG_INFO("Physical device %d doesn't support "
+					"presentation surface!", i);
+
+				RAW_MEM_FREE(queue_families);
+				RAW_MEM_FREE(device_extensions);
+			
+				if (i < n_physical_devices - 1)
+					continue;
+				else {
+					RAW_LOG_ERROR("There's no physical device "
+						"with presentation surface support!");
+
+					return false;
+				}
 			}
 		}
 
@@ -236,9 +321,8 @@ bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 			uint32_t queue_family_index; 
 
 			if (rawGetVulkanPhysicalDeviceQueueFamilyIndex(
-				physical_devices[i], queue_families,
-				n_queue_families, desired_queue_capabilities[j],
-				&queue_family_index))
+				queue_families, n_queue_families,
+				desired_queue_capabilities[j], &queue_family_index))
 				++n_queues_per_queue_family[queue_family_index];
 			else {
 				physical_device_support_desired_queues = false;
@@ -329,6 +413,6 @@ bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 		RAW_MEM_FREE(device_extensions);
 	}
 
-	return true;
+	return false;
 }
 

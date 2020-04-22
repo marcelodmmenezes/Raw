@@ -33,7 +33,7 @@
 ##
 
 unitTestsXCB:
-	gcc -std=c11 -Wall                                      \
+	gcc -std=c11 -Wall -Wextra                              \
 	unitTests/rawLinuxXCB.c                                 \
 	engine/vulkan/rawVulkan.c                               \
 	engine/vulkan/rawVulkanInstance.c                       \

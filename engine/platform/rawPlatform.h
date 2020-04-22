@@ -84,7 +84,7 @@ void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
 
 #if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
 #define VK_USE_PLATFORM_XCB_KHR
-#define RAW_VULKAN_SURFACE_EXTENSION_NAME \
+#define RAW_VULKAN_PLATFORM_SURFACE_EXTENSION_NAME \
 	VK_KHR_XCB_SURFACE_EXTENSION_NAME
 #define RAW_VULKAN_SURFACE_CREATE_INFO \
 	VkXcbSurfaceCreateInfoKHR
@@ -97,7 +97,6 @@ void rawPlatformSwitchTerminalColor(RawPlatformTerminalColor color);
 #define RAW_VULKAN_CREATE_SURFACE(...) \
 	vkCreateXcbSurfaceKHR(__VA_ARGS__)
 #elif defined (RAW_PLATFORM_XLIB_WINDOW_SYSTEM)
-#define VK_USE_PLATFORM_XLIB_KHR
 // TODO: xlib surface creation type
 #endif
 
