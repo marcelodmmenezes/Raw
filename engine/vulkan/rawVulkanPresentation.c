@@ -49,8 +49,8 @@ bool rawCreateVulkanPresentationSurface(
 	};
 
 	// TODO: Pass allocation callback
-	VkResult result = RAW_VULKAN_CREATE_SURFACE(instance, &surface_create_info,
-		RAW_NULL_PTR, presentation_surface);
+	VkResult result = RAW_VULKAN_CREATE_SURFACE(instance,
+		&surface_create_info, RAW_NULL_PTR, presentation_surface);
 
 	if ((result != VK_SUCCESS) || (*presentation_surface == VK_NULL_HANDLE)) {
 		RAW_LOG_ERROR("Vulkan presentation surface creation failed!");

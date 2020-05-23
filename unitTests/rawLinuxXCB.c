@@ -29,7 +29,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 22/04/2020
+ * Last modified: 23/05/2020
  */
 
 #include <unitTests/rawCrossPlatformTests.h>
@@ -64,6 +64,17 @@ void createXcbWindow(xcb_connection_t* connection, xcb_window_t* window) {
 	RAW_ASSERT(xcb_flush(connection) > 0, "XCB flush error!");
 }
 
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+	VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+	VkDebugUtilsMessageTypeFlagsEXT message_type,
+	VkDebugUtilsMessengerCallbackDataEXT const* p_callback_data,
+	void* user_data) {
+
+	RAW_LOG_WARNING("VALIDATION LAYER: %s", p_callback_data->pMessage);
+
+	return VK_FALSE;
+}
+
 void testVulkanPresentationSurfaceCreationAndDestruction(
 	xcb_connection_t* connection,
 	xcb_window_t window) {
@@ -93,7 +104,7 @@ void testVulkanPresentationSurfaceCreationAndDestruction(
 		"VK_LAYER_KHRONOS_validation"
 	};
 
-	uint32_t n_desired_instance_layers = 1;
+	uint32_t n_desired_instance_layers = 1u;
 
 	char const* desired_instance_extensions[] = {
 		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
@@ -101,21 +112,42 @@ void testVulkanPresentationSurfaceCreationAndDestruction(
 		RAW_VULKAN_PLATFORM_SURFACE_EXTENSION_NAME
 	};
 
-	uint32_t n_desired_instance_extensions = 3;
+	uint32_t n_desired_instance_extensions = 3u;
+
+	VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {
+		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+		.pNext = RAW_NULL_PTR,
+		.flags = 0,
+		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+		.pfnUserCallback = debugCallback,
+		.pUserData = RAW_NULL_PTR
+	};
 
 	bool result = rawCreateVulkanInstance(&instance,
 		available_instance_layers, n_available_instance_layers,
 		desired_instance_layers, n_desired_instance_layers,
 		available_instance_extensions, n_available_instance_extensions,
 		desired_instance_extensions, n_desired_instance_extensions,
-		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0), &debug_create_info);
 
 	RAW_ASSERT(result, "rawCreateVulkanInstance failed");
 
-	result = rawLoadVulkanInstanceLevelFunctions(
-		instance, desired_instance_extensions, n_desired_instance_extensions);
+	result = rawLoadVulkanInstanceLevelFunctions(instance,
+		desired_instance_extensions, n_desired_instance_extensions, true);
 
 	RAW_ASSERT(result, "rawLoadVulkanInstanceLevelFunctions failed");
+
+	VkDebugUtilsMessengerEXT debug_messenger;
+
+	result = vkCreateDebugUtilsMessengerEXT(instance,
+		&debug_create_info, RAW_NULL_PTR, &debug_messenger);
+
+	RAW_ASSERT(result == VK_SUCCESS, "Could not create debug messenger!");
 
 	// Presentation surface creation
 	VkSurfaceKHR presentation_surface;
@@ -136,7 +168,7 @@ void testVulkanPresentationSurfaceCreationAndDestruction(
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
-	uint32_t n_desired_device_extensions = 1;
+	uint32_t n_desired_device_extensions = 1u;
 
 	VkPhysicalDeviceFeatures features;
 	VkPhysicalDeviceProperties properties;
@@ -146,7 +178,7 @@ void testVulkanPresentationSurfaceCreationAndDestruction(
 		VK_QUEUE_COMPUTE_BIT
 	};
 
-	uint32_t n_desired_queue_capabilities = 2;
+	uint32_t n_desired_queue_capabilities = 2u;
 
 	float* queue_priorities = RAW_NULL_PTR;
 	uint32_t n_queue_priorities;
@@ -159,10 +191,26 @@ void testVulkanPresentationSurfaceCreationAndDestruction(
 
 puts("Testing A");fflush(stdout);
 
+RAW_LOG_WARNING("%p", vkGetPhysicalDeviceSurfacePresentModesKHR);
+RAW_LOG_WARNING("%p", vkGetPhysicalDeviceSurfaceFormatsKHR);
+RAW_LOG_WARNING("%p", vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
+RAW_LOG_WARNING("%p", vkGetPhysicalDeviceSurfaceSupportKHR);
+
 uint32_t n_present_modes = 0u;
 result = vkGetPhysicalDeviceSurfacePresentModesKHR(physical_devices[0],
 	presentation_surface, &n_present_modes, RAW_NULL_PTR);
 printf("%u %u\n", result, n_present_modes);fflush(stdout);
+VkPresentModeKHR* present_modes;
+RAW_ASSERT(result == VK_SUCCESS, "TESTING");
+RAW_MEM_ALLOC(present_modes,
+	(uint64_t)n_present_modes, sizeof(VkPresentModeKHR));
+result = vkGetPhysicalDeviceSurfacePresentModesKHR(physical_devices[0],
+	presentation_surface, &n_present_modes, present_modes);
+RAW_ASSERT(result == VK_SUCCESS && n_present_modes > 0, "TESTING");
+for (uint32_t i = 0; i < n_present_modes; ++i)
+	RAW_LOG_WARNING("%d", present_modes[i]);
+RAW_MEM_FREE(present_modes);
+
 /*
 uint32_t n_formats = 0u;
 result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_devices[0],
@@ -205,7 +253,6 @@ puts("Testing C");fflush(stdout);
 	rawCreateVulkanLogicalDevice(
 		physical_devices[physical_device_index],
 		queue_create_infos, n_queue_create_infos,
-		desired_instance_layers, n_desired_instance_layers,
 		desired_device_extensions, n_desired_device_extensions,
 		&features, &logical_device);
 
@@ -237,6 +284,7 @@ puts("Testing C");fflush(stdout);
 }
 
 int main() {
+/*
 	testLoggingLibrary();
 	testMemoryAllocation();
 	testVulkanLibraryLoading();
@@ -244,7 +292,7 @@ int main() {
 	testVulkanPhysicalDeviceCreationAndDestruction();
 	testRawSelectPhysicalDeviceWithDesiredCharacteristics();
 	testVulkanLogicalDeviceCreationAndDestruction();
-
+*/	
 	xcb_connection_t* connection = RAW_NULL_PTR;
 	xcb_window_t window;
 

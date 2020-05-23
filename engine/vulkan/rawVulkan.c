@@ -35,7 +35,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 20/03/2020
+ * Last modified: 23/05/2020
  */
 
 #include <engine/vulkan/rawVulkan.h>
@@ -88,6 +88,10 @@ PFN_vkDestroyInstance
 /*
  * Vulkan instance level extensions
  */
+PFN_vkCreateDebugUtilsMessengerEXT
+	vkCreateDebugUtilsMessengerEXT;
+PFN_vkDestroyDebugUtilsMessengerEXT
+	vkDestroyDebugUtilsMessengerEXT;
 PFN_vkGetPhysicalDeviceSurfaceSupportKHR
 	vkGetPhysicalDeviceSurfaceSupportKHR;
 PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR
@@ -341,7 +345,8 @@ bool rawLoadVulkan(RAW_VULKAN_LIBRARY* vulkan) {
 bool rawLoadVulkanInstanceLevelFunctions(
 	VkInstance instance,
 	char const* const* enabled_extensions,
-	uint32_t n_enabled_extensions) {
+	uint32_t n_enabled_extensions,
+	bool load_debug_layer) {
 
 #define LOAD(func)                                             \
 	func = (PFN_##func)vkGetInstanceProcAddr(instance, #func); \
@@ -364,9 +369,15 @@ bool rawLoadVulkanInstanceLevelFunctions(
 	LOAD(vkDestroyInstance);
 #undef LOAD
 
+	bool extension_enabled;
+
 #define LOAD(func, extension)                                          \
+	extension_enabled = false;                                         \
+                                                                       \
 	for (uint32_t i = 0; i < n_enabled_extensions; ++i) {              \
 		if (strcmp(enabled_extensions[i], extension) == 0) {           \
+			extension_enabled = true;                                  \
+                                                                       \
 			func = (PFN_##func)vkGetInstanceProcAddr(instance, #func); \
                                                                        \
 			if (!func) {                                               \
@@ -375,6 +386,20 @@ bool rawLoadVulkanInstanceLevelFunctions(
 				return false;                                          \
 			}                                                          \
 		}                                                              \
+	}                                                                  \
+                                                                       \
+	if (!extension_enabled) {                                          \
+		RAW_LOG_ERROR("Required extension " #extension                 \
+			" was not enabled!");                                      \
+			                                                           \
+		return false;                                                  \
+	}
+
+	if (load_debug_layer) {
+		LOAD(vkCreateDebugUtilsMessengerEXT,
+			VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		LOAD(vkDestroyDebugUtilsMessengerEXT,
+			VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
 
 	LOAD(vkGetPhysicalDeviceSurfaceSupportKHR,
@@ -391,7 +416,7 @@ bool rawLoadVulkanInstanceLevelFunctions(
 #if defined (RAW_PLATFORM_LINUX)
 #if defined (RAW_PLATFORM_XCB_WINDOW_SYSTEM)
 	LOAD(vkCreateXcbSurfaceKHR,
-		VK_KHR_SURFACE_EXTENSION_NAME);
+		RAW_VULKAN_PLATFORM_SURFACE_EXTENSION_NAME);
 #endif
 #endif
 #undef LOAD
@@ -503,9 +528,15 @@ bool rawLoadVulkanDeviceLevelFunctions(
 	LOAD(vkCmdClearAttachments);
 #undef LOAD
 
+	bool extension_enabled;
+
 #define LOAD(func, extension)                                              \
+	extension_enabled = false;                                             \
+                                                                           \
 	for (uint32_t i = 0; i < n_enabled_extensions; ++i) {                  \
 		if (strcmp(enabled_extensions[i], extension) == 0) {               \
+			extension_enabled = true;                                      \
+                                                                           \
 			func = (PFN_##func)vkGetDeviceProcAddr(logical_device, #func); \
                                                                            \
 			if (!func) {                                                   \
@@ -514,6 +545,13 @@ bool rawLoadVulkanDeviceLevelFunctions(
 				return false;                                              \
 			}                                                              \
 		}                                                                  \
+	}                                                                      \
+                                                                           \
+	if (!extension_enabled) {                                              \
+		RAW_LOG_ERROR("Required extension " #extension                     \
+			" was not enabled!");                                          \
+			                                                               \
+		return false;                                                      \
 	}
 
 	LOAD(vkCreateSwapchainKHR,

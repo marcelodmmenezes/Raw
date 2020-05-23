@@ -76,7 +76,8 @@ bool rawCreateVulkanInstance(
 	char const* const* const desired_extensions,
 	uint32_t n_desired_extensions,
 	char const* const application_name,
-	uint32_t application_version);
+	uint32_t application_version,
+	VkDebugUtilsMessengerCreateInfoEXT const* debug_create_info);
 
 void rawDestroyVulkanInstance(VkInstance* instance);
 

@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 19/03/2020
- * Last modified: 08/04/2020
+ * Last modified: 22/04/2020
  */
 
 #include <engine/vulkan/rawVulkanLogicalDevice.h>
@@ -38,8 +38,6 @@ bool rawCreateVulkanLogicalDevice(
 	VkPhysicalDevice physical_device,
 	VkDeviceQueueCreateInfo const* const device_queues,
 	uint32_t n_device_queues,
-	char const* const* layers,
-	uint32_t n_layers,
 	char const* const* device_extensions,
 	uint32_t n_device_extensions,
 	VkPhysicalDeviceFeatures* device_features,
@@ -51,9 +49,9 @@ bool rawCreateVulkanLogicalDevice(
 		.flags = 0,
 		.queueCreateInfoCount = n_device_queues,
 		.pQueueCreateInfos = device_queues,
-		.enabledLayerCount = n_layers,
-		.ppEnabledLayerNames = layers,
-		.enabledExtensionCount = n_device_extensions,
+		.enabledLayerCount = 0u,
+		.ppEnabledLayerNames = RAW_NULL_PTR,
+			.enabledExtensionCount = n_device_extensions,
 		.ppEnabledExtensionNames = device_extensions,
 		.pEnabledFeatures = device_features
 	};

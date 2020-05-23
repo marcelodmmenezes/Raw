@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 20/03/2020
+ * Last modified: 23/05/2020
  */
 
 #ifndef RAW_VULKAN_H
@@ -127,6 +127,16 @@ extern PFN_vkDestroyInstance
 /*
  * Vulkan instance level extensions
  */
+#define vkCreateDebugUtilsMessengerEXT \
+ 	rawVkCreateDebugUtilsMessengerEXT
+extern PFN_vkCreateDebugUtilsMessengerEXT
+	vkCreateDebugUtilsMessengerEXT;
+
+#define vkDestroyDebugUtilsMessengerEXT \
+	rawVkDestroyDebugUtilsMessengerEXT
+extern PFN_vkDestroyDebugUtilsMessengerEXT
+	vkDestroyDebugUtilsMessengerEXT;
+
 #define vkGetPhysicalDeviceSurfaceSupportKHR \
 	rawVkGetPhysicalDeviceSurfaceSupportKHR
 extern PFN_vkGetPhysicalDeviceSurfaceSupportKHR
@@ -650,7 +660,8 @@ bool rawLoadVulkan(RAW_VULKAN_LIBRARY* vulkan);
 bool rawLoadVulkanInstanceLevelFunctions(
 	VkInstance instance,
 	char const* const* enabled_extensions,
-	uint32_t n_enabled_extensions);
+	uint32_t n_enabled_extensions,
+	bool load_debug_layer);
 
 /*
  * Loads Vulkan device level functions and extensions.

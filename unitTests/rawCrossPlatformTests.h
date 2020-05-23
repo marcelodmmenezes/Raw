@@ -99,7 +99,7 @@ void testVulkanInstanceCreationAndDestruction() {
 
 	RAW_LOG_CMSG(RAW_LOG_MAGENTA, "\n\tAvailable Vulkan instance layers:\n");
 
-	for (uint32_t i = 0; i < n_available_layers; ++i)
+	for (uint32_t i = 0u; i < n_available_layers; ++i)
 		RAW_LOG_CMSG(RAW_LOG_CYAN, "\t%s\n",
 			available_instance_layers[i].layerName);
 
@@ -114,29 +114,33 @@ void testVulkanInstanceCreationAndDestruction() {
 	RAW_LOG_CMSG(RAW_LOG_MAGENTA,
 		"\n\tAvailable Vulkan instance extensions:\n");
 
-	for (uint32_t i = 0; i < n_available_intance_extensions; ++i)
+	for (uint32_t i = 0u; i < n_available_intance_extensions; ++i)
 		RAW_LOG_CMSG(RAW_LOG_CYAN, "\t%s\n",
 			available_intance_extensions[i].extensionName);
 
 	VkInstance instance = VK_NULL_HANDLE;
 
-	// Testing with 0 layers and 0 extensions
+	// Testing with 0 layers
 	char const** desired_instance_layers = RAW_NULL_PTR;
-	uint32_t n_desired_instance_layers = 0;
+	uint32_t n_desired_instance_layers = 0u;
 
-	char const** desired_extensions = RAW_NULL_PTR;
-	uint32_t n_desired_extensions = 0;
+	char const* desired_instance_extensions[] = {
+		VK_KHR_SURFACE_EXTENSION_NAME,
+		RAW_VULKAN_PLATFORM_SURFACE_EXTENSION_NAME
+	};
+
+	uint32_t n_desired_instance_extensions = 2u;
 
 	result = rawCreateVulkanInstance(&instance, available_instance_layers,
 		n_available_layers, desired_instance_layers, n_desired_instance_layers,
 		available_intance_extensions, n_available_intance_extensions,
-		desired_extensions, n_desired_extensions,
-		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+		desired_instance_extensions, n_desired_instance_extensions,
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0), RAW_NULL_PTR);
 
 	RAW_ASSERT(result, "Vulkan instance creation failed!");
 
-	result = rawLoadVulkanInstanceLevelFunctions(
-		instance, desired_extensions, n_desired_extensions);
+	result = rawLoadVulkanInstanceLevelFunctions(instance,
+		desired_instance_extensions, n_desired_instance_extensions, false);
 
 	RAW_ASSERT(result, "rawLoadVulkanInstanceLevelFunctions failed!");
 
@@ -185,24 +189,26 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 		"VK_LAYER_KHRONOS_validation"
 	};
 
-	uint32_t n_desired_instance_layers = 1;
+	uint32_t n_desired_instance_layers = 1u;
 
-	char const* desired_extensions[] = {
-		VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+	char const* desired_instance_extensions[] = {
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+		VK_KHR_SURFACE_EXTENSION_NAME,
+		RAW_VULKAN_PLATFORM_SURFACE_EXTENSION_NAME
 	};
 
-	uint32_t n_desired_extensions = 1;
+	uint32_t n_desired_instance_extensions = 3u;
 
 	result = rawCreateVulkanInstance(&instance, available_instance_layers,
 		n_available_layers, desired_instance_layers, n_desired_instance_layers,
 		available_intance_extensions, n_available_intance_extensions,
-		desired_extensions, n_desired_extensions,
-		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+		desired_instance_extensions, n_desired_instance_extensions,
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0), RAW_NULL_PTR);
 
 	RAW_ASSERT(result, "Vulkan instance creation failed!");
 
-	rawLoadVulkanInstanceLevelFunctions(
-		instance, desired_extensions, n_desired_extensions);
+	rawLoadVulkanInstanceLevelFunctions(instance,
+		desired_instance_extensions, n_desired_instance_extensions, false);
 	
 	// Physical device creation
 	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
@@ -213,7 +219,7 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 
 	RAW_ASSERT(result, "rawGetPhysicalDevices failed!");
 
-	for (uint32_t i = 0; i < n_physical_devices; ++i) {
+	for (uint32_t i = 0u; i < n_physical_devices; ++i) {
 		VkExtensionProperties* device_extensions = RAW_NULL_PTR;
 		uint32_t n_device_extensions;
 
@@ -233,7 +239,7 @@ void testVulkanPhysicalDeviceCreationAndDestruction() {
 		RAW_LOG_CMSG(RAW_LOG_MAGENTA,
 			"\n\tPhysical device %d available extensions:\n", i);
 
-		for (uint32_t j = 0; j < n_device_extensions; ++j)
+		for (uint32_t j = 0u; j < n_device_extensions; ++j)
 			RAW_LOG_CMSG(RAW_LOG_CYAN, "\t%s\n",
 				device_extensions[j].extensionName);
 
@@ -292,22 +298,24 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 		"VK_LAYER_KHRONOS_validation"
 	};
 
-	uint32_t n_desired_instance_layers = 1;
+	uint32_t n_desired_instance_layers = 1u;
 
 	char const* desired_instance_extensions[] = {
-		VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+		VK_KHR_SURFACE_EXTENSION_NAME,
+		RAW_VULKAN_PLATFORM_SURFACE_EXTENSION_NAME
 	};
 
-	uint32_t n_desired_instance_extensions = 1;
+	uint32_t n_desired_instance_extensions = 3u;
 
 	rawCreateVulkanInstance(&instance, available_instance_layers,
 		n_available_layers, desired_instance_layers, n_desired_instance_layers,
 		available_instance_extensions, n_available_intance_extensions,
 		desired_instance_extensions, n_desired_instance_extensions,
-		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0), RAW_NULL_PTR);
 
 	rawLoadVulkanInstanceLevelFunctions(
-		instance, desired_instance_extensions, n_desired_instance_extensions);
+		instance, desired_instance_extensions, n_desired_instance_extensions, false);
 
 	// Physical device creation
 	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
@@ -321,10 +329,10 @@ void testRawSelectPhysicalDeviceWithDesiredCharacteristics() {
 
 	// rawSelectPhysicalDeviceWithDesiredCharacteristics test
 	char const* const* const desired_device_extensions = RAW_NULL_PTR;
-	uint32_t n_desired_device_extensions = 0;
+	uint32_t n_desired_device_extensions = 0u;
 
 	VkQueueFlags* desired_queue_capabilities = RAW_NULL_PTR;
-	uint32_t n_desired_queue_capabilities = 0;
+	uint32_t n_desired_queue_capabilities = 0u;
 
 	float* queue_priorities;
 	uint32_t n_queue_priorities;
@@ -394,22 +402,24 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 		"VK_LAYER_KHRONOS_validation"
 	};
 
-	uint32_t n_desired_instance_layers = 1;
+	uint32_t n_desired_instance_layers = 1u;
 
 	char const* desired_instance_extensions[] = {
-		VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+		VK_KHR_SURFACE_EXTENSION_NAME,
+		RAW_VULKAN_PLATFORM_SURFACE_EXTENSION_NAME
 	};
 
-	uint32_t n_desired_instance_extensions = 1;
+	uint32_t n_desired_instance_extensions = 3u;
 
 	rawCreateVulkanInstance(&instance, available_instance_layers,
 		n_available_layers, desired_instance_layers, n_desired_instance_layers,
 		available_instance_extensions, n_available_intance_extensions,
 		desired_instance_extensions, n_desired_instance_extensions,
-		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0));
+		"rawLinuxXCB", VK_MAKE_VERSION(1, 0, 0), RAW_NULL_PTR);
 
 	rawLoadVulkanInstanceLevelFunctions(instance,
-		desired_instance_extensions, n_desired_instance_extensions);
+		desired_instance_extensions, n_desired_instance_extensions, false);
 
 	// Physical device creation and selection
 	VkPhysicalDevice* physical_devices = RAW_NULL_PTR;
@@ -418,8 +428,11 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 	rawGetVulkanPhysicalDevices(instance,
 		&physical_devices, &n_physical_devices);
 
-	char const** desired_device_extensions = RAW_NULL_PTR;
-	uint32_t n_desired_device_extensions = 0;
+	char const* desired_device_extensions[] = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	};
+
+	uint32_t n_desired_device_extensions = 1u;
 
 	VkPhysicalDeviceFeatures features;
 	VkPhysicalDeviceProperties properties;
@@ -429,7 +442,7 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 		VK_QUEUE_COMPUTE_BIT
 	};
 
-	uint32_t n_desired_queue_capabilities = 2;
+	uint32_t n_desired_queue_capabilities = 2u;
 
 	float* queue_priorities = RAW_NULL_PTR;
 	uint32_t n_queue_priorities;
@@ -456,7 +469,6 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 	result = rawCreateVulkanLogicalDevice(
 		physical_devices[physical_device_index],
 		queue_create_infos, n_queue_create_infos,
-		desired_instance_layers, n_desired_instance_layers,
 		desired_device_extensions, n_desired_device_extensions,
 		&features, &logical_device);
 

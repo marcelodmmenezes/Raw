@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 22/04/2020
+ * Last modified: 23/05/2020
  */
 
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
@@ -219,6 +219,16 @@ bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 				return false;
 			}
 		}
+
+		RAW_LOG_INFO("Checking physical device %d\n\t\t "
+			"API version: %d\n\t\t Driver version: %d\n\t\t "
+			"Vendor ID: %d\n\t\t Device ID: %d\n\t\t "
+			"Device type: %d\n\t\t Device name: %s\n\t\t "
+			"Number of queue families: %d\n", i,
+			properties->apiVersion, properties->driverVersion,
+			properties->vendorID, properties->deviceID,
+			properties->deviceType, properties->deviceName,
+			n_queue_families);
 
 		// Checking extensions
 		for (uint32_t i = 0; i < n_desired_extensions; ++i) {

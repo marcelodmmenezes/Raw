@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 08/04/2020
+ * Last modified: 23/05/2020
  */
 
 #include <engine/vulkan/rawVulkanInstance.h>
@@ -126,7 +126,8 @@ bool rawCreateVulkanInstance(
 	char const* const* const desired_extensions,
 	uint32_t n_desired_extensions,
 	char const* const application_name,
-	uint32_t application_version) {
+	uint32_t application_version,
+	VkDebugUtilsMessengerCreateInfoEXT const* debug_create_info) {
 
 	// Checking layers
 	for (uint32_t i = 0; i < n_desired_layers; ++i) {
@@ -186,6 +187,10 @@ bool rawCreateVulkanInstance(
 		.enabledExtensionCount = n_desired_extensions,
 		.ppEnabledExtensionNames = desired_extensions
 	};
+
+	if (debug_create_info)
+		instance_create_info.pNext =
+			(VkDebugUtilsMessengerCreateInfoEXT*)debug_create_info;
 
 	// TODO: Pass allocation callback
 	VkResult result = vkCreateInstance(
