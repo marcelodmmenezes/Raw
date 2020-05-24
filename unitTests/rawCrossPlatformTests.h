@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 20/03/2020
- * Last modified: 22/04/2020
+ * Last modified: 23/05/2020
  */
 
 #ifndef RAW_CROSS_PLATFORM_TESTS
@@ -474,7 +474,7 @@ void testVulkanLogicalDeviceCreationAndDestruction() {
 
 	RAW_ASSERT(result, "rawCreateVulkanLogicalDevice failed!");
 
-	rawLoadVulkanDeviceLevelFunctions(logical_device,
+	result = rawLoadVulkanDeviceLevelFunctions(logical_device,
 		desired_device_extensions, n_desired_device_extensions);
 
 	// Logical device destruction

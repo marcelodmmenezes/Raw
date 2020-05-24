@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 18/03/2020
- * Last modified: 23/05/2020
+ * Last modified: 24/05/2020
  */
 
 #include <engine/vulkan/rawVulkanPhysicalDevice.h>
@@ -267,11 +267,9 @@ bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 			VkBool32 presentation_supported = VK_FALSE;
 
 			for (uint32_t j = 0; j < n_queue_families; ++j) {
-puts("A");fflush(stdout);
 				VkResult result = vkGetPhysicalDeviceSurfaceSupportKHR(
 					physical_devices[i], j, presentation_surface,
 					&presentation_supported);
-puts("B");fflush(stdout);
 
 				if (result != VK_SUCCESS)
 					RAW_LOG_WARNING("vkGetPhysicalDeviceSurfaceSupportKHR "
@@ -364,7 +362,6 @@ puts("B");fflush(stdout);
 					*n_queue_priorities = n_queues_per_queue_family[j];
 			}
 
-			// TODO: Give different priorities for each queue
 			RAW_MEM_ALLOC(*queue_priorities,
 				(uint64_t)*n_queue_priorities, sizeof(float));
 
@@ -391,6 +388,10 @@ puts("B");fflush(stdout);
 
 				return false;
 			}
+
+			// TODO: Give different priorities for each queue
+			for (uint32_t j = 0; j < *n_queue_priorities; ++j)
+				(*queue_priorities)[j] = 0.9f;
 
 			// Selecting necessary queues for logical device creation
 			for (uint32_t j = 0, it = 0; j < n_queue_families; ++j) {

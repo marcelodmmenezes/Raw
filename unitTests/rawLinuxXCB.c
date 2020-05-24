@@ -29,7 +29,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 23/05/2020
+ * Last modified: 24/05/2020
  */
 
 #include <unitTests/rawCrossPlatformTests.h>
@@ -37,40 +37,40 @@
 #include <string.h>
 
 // TODO: Create a usable window
-void createXcbWindow(xcb_connection_t* connection, xcb_window_t* window) {
+void createXcbWindow(xcb_connection_t** connection, xcb_window_t* window) {
 	xcb_screen_t* screen;
 
-	connection = xcb_connect(RAW_NULL_PTR, RAW_NULL_PTR);
+	*connection = xcb_connect(RAW_NULL_PTR, RAW_NULL_PTR);
 
-	RAW_ASSERT(!xcb_connection_has_error(connection),
+	RAW_ASSERT(!xcb_connection_has_error(*connection),
 		"Error connecting XCB!");
 
-	screen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
-	*window = xcb_generate_id(connection);
+	screen = xcb_setup_roots_iterator(xcb_get_setup(*connection)).data;
+	*window = xcb_generate_id(*connection);
 
 	uint32_t event_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 	uint32_t value_list[] = { screen->black_pixel, 0 };
 
-	xcb_create_window(connection, XCB_COPY_FROM_PARENT,
+	xcb_create_window(*connection, XCB_COPY_FROM_PARENT,
 		*window, screen->root, 0, 0, 800, 600, 0,
 		XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual,
 		event_mask, value_list);
 
-	xcb_change_property(connection, XCB_PROP_MODE_REPLACE, *window,
+	xcb_change_property(*connection, XCB_PROP_MODE_REPLACE, *window,
 		XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen("rawLinuxXCB"),
 		"rawLinuxXCB");
 
-	xcb_map_window(connection, *window);
-	RAW_ASSERT(xcb_flush(connection) > 0, "XCB flush error!");
+	xcb_map_window(*connection, *window);
+	RAW_ASSERT(xcb_flush(*connection) > 0, "XCB flush error!");
 }
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
 	VkDebugUtilsMessageTypeFlagsEXT message_type,
-	VkDebugUtilsMessengerCallbackDataEXT const* p_callback_data,
+	VkDebugUtilsMessengerCallbackDataEXT const* callback_data,
 	void* user_data) {
 
-	RAW_LOG_WARNING("VALIDATION LAYER: %s", p_callback_data->pMessage);
+	RAW_LOG_WARNING("VALIDATION LAYER: %s", callback_data->pMessage);
 
 	return VK_FALSE;
 }
@@ -189,48 +189,6 @@ void testVulkanPresentationSurfaceCreationAndDestruction(
 	uint32_t presentation_queue_index;
 	uint32_t physical_device_index;
 
-puts("Testing A");fflush(stdout);
-
-RAW_LOG_WARNING("%p", vkGetPhysicalDeviceSurfacePresentModesKHR);
-RAW_LOG_WARNING("%p", vkGetPhysicalDeviceSurfaceFormatsKHR);
-RAW_LOG_WARNING("%p", vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
-RAW_LOG_WARNING("%p", vkGetPhysicalDeviceSurfaceSupportKHR);
-
-uint32_t n_present_modes = 0u;
-result = vkGetPhysicalDeviceSurfacePresentModesKHR(physical_devices[0],
-	presentation_surface, &n_present_modes, RAW_NULL_PTR);
-printf("%u %u\n", result, n_present_modes);fflush(stdout);
-VkPresentModeKHR* present_modes;
-RAW_ASSERT(result == VK_SUCCESS, "TESTING");
-RAW_MEM_ALLOC(present_modes,
-	(uint64_t)n_present_modes, sizeof(VkPresentModeKHR));
-result = vkGetPhysicalDeviceSurfacePresentModesKHR(physical_devices[0],
-	presentation_surface, &n_present_modes, present_modes);
-RAW_ASSERT(result == VK_SUCCESS && n_present_modes > 0, "TESTING");
-for (uint32_t i = 0; i < n_present_modes; ++i)
-	RAW_LOG_WARNING("%d", present_modes[i]);
-RAW_MEM_FREE(present_modes);
-
-/*
-uint32_t n_formats = 0u;
-result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_devices[0],
-	presentation_surface, &n_formats, RAW_NULL_PTR);
-printf("%u %u\n", result, n_formats);fflush(stdout);
-*/
-/*
-VkSurfaceCapabilitiesKHR capabilities;
-result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_devices[0],
-	presentation_surface, &capabilities);
-printf("%u\n", result);fflush(stdout);
-*/
-/*
-VkBool32 presentation_supported = VK_FALSE;
-result = vkGetPhysicalDeviceSurfaceSupportKHR(physical_devices[0],
-	0, presentation_surface, &presentation_supported);
-printf("%u %u\n", result, presentation_supported);fflush(stdout);
-*/
-
-puts("Testing B");fflush(stdout);
 	result = rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 		physical_devices, n_physical_devices,
 		desired_device_extensions, n_desired_device_extensions,
@@ -240,7 +198,6 @@ puts("Testing B");fflush(stdout);
 		&queue_create_infos, &n_queue_create_infos,
 		presentation_surface, &presentation_queue_index,
 		&physical_device_index);
-puts("Testing C");fflush(stdout);
 
 	RAW_ASSERT(result,
 		"rawSelectPhysicalDeviceWithDesiredCharacteristics failed!");
@@ -266,6 +223,9 @@ puts("Testing C");fflush(stdout);
 	RAW_MEM_FREE(queue_priorities);
 	RAW_MEM_FREE(physical_devices);
 	
+	// Debug messenger destruction
+	vkDestroyDebugUtilsMessengerEXT(instance, debug_messenger, RAW_NULL_PTR);
+
 	// Presentation surface destruction
 	rawDestroyVulkanPresentationSurface(instance, &presentation_surface);
 
@@ -284,7 +244,6 @@ puts("Testing C");fflush(stdout);
 }
 
 int main() {
-/*
 	testLoggingLibrary();
 	testMemoryAllocation();
 	testVulkanLibraryLoading();
@@ -292,11 +251,11 @@ int main() {
 	testVulkanPhysicalDeviceCreationAndDestruction();
 	testRawSelectPhysicalDeviceWithDesiredCharacteristics();
 	testVulkanLogicalDeviceCreationAndDestruction();
-*/	
+	
 	xcb_connection_t* connection = RAW_NULL_PTR;
 	xcb_window_t window;
 
-	createXcbWindow(connection, &window);
+	createXcbWindow(&connection, &window);
 	testVulkanPresentationSurfaceCreationAndDestruction(connection, window);
 
 	RAW_LOG_CMSG(RAW_LOG_GREEN, "All tests succeeded!\n");
