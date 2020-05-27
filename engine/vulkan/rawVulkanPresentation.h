@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 08/04/2020
- * Last modified: 22/04/2020
+ * Last modified: 26/05/2020
  */
 
 #ifndef RAW_VULKAN_PRESENTATION_H
@@ -49,6 +49,47 @@ bool rawCreateVulkanPresentationSurface(
 	RAW_VULKAN_SURFACE_DISPLAY display,
 	RAW_VULKAN_SURFACE_WINDOW window,
 	VkSurfaceKHR* presentation_surface);
+
+/*
+ * If successful, the function will allocate memory for:
+ *     @*present_modes
+ *
+ * It's the caller's responsibility to free that
+ * memory through a call to RAW_MEM_FREE
+ */
+bool rawGetAvailableVulkanPresentModes(
+	VkPhysicalDevice physical_device,
+	VkSurfaceKHR presentation_surface,
+	VkPresentModeKHR** present_modes,
+	uint32_t* n_present_modes);
+
+/*
+ * If successful, the following parameters will be affected:
+ *     @*n_swapchain_images:
+ *                        will contain the number of
+ *                        allocated swapchain images
+ *     @*swapchain_width:
+ *     @*swapchain_height:
+ *                        if not null and the surface capabilities
+ *                        extent is 0xFFFFFFFF, its values will
+ *                        determine the dimensions of the swapchain.
+ *                        if null and the surface capabilities
+ *                        extent height is 0xFFFFFFF, the swapchain dimensions
+ *                        will have the default value of 1024 x 768, and
+ *                        these values will be stored on the parameters
+ *                        otherwise the swapchain dimensions will be determined
+ *                        by the surface capabilities, and the values will be
+ *                        stored on the parameters
+ */
+bool rawCreateSwapChain(
+	VkPhysicalDevice physical_device,
+	VkSurfaceKHR presentation_surface,
+	VkPresentModeKHR desired_present_mode,
+	VkImageUsageFlags desired_image_usage,
+	VkSurfaceTransformFlagBitsKHR desired_transformation,
+	uint32_t* n_swapchain_images,
+	uint32_t* swapchain_width,
+	uint32_t* swapchain_height);
 
 void rawDestroyVulkanPresentationSurface(
 	VkInstance instance,

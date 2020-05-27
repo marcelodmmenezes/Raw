@@ -202,7 +202,14 @@ void testVulkanPresentationSurfaceCreationAndDestruction(
 	RAW_ASSERT(result,
 		"rawSelectPhysicalDeviceWithDesiredCharacteristics failed!");
 
-	RAW_LOG_INFO("Selecting physical device %d", physical_device_index);
+	RAW_LOG_INFO("Selected physical device: %d\n\t\t "
+		"Number of extensions: %d\n\t\t "
+		"Number of queue families: %d\n\t\t "
+		"Index of presentation queue: %d",
+		physical_device_index,
+		n_desired_device_extensions,
+		n_queue_create_infos,
+		presentation_queue_index);
 
 	// Logical device creation
 	VkDevice logical_device;

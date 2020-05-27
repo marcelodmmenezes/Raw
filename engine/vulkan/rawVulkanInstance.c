@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 16/03/2020
- * Last modified: 23/05/2020
+ * Last modified: 24/05/2020
  */
 
 #include <engine/vulkan/rawVulkanInstance.h>
@@ -46,7 +46,6 @@ bool rawGetAvailableVulkanInstanceLayers(
 
 	if (result != VK_SUCCESS) {
 		RAW_LOG_ERROR("vkEnumerateInstanceLayerProperties failed!");
-
 		return false;
 	}
 
@@ -57,8 +56,6 @@ bool rawGetAvailableVulkanInstanceLayers(
 		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on "
 			"rawGetAvailableVulkanInstanceLayers");
 
-		RAW_MEM_FREE(*available_layers);
-
 		return false;
 	}
 
@@ -67,9 +64,7 @@ bool rawGetAvailableVulkanInstanceLayers(
 
 	if (result != VK_SUCCESS) {
 		RAW_LOG_ERROR("vkEnumerateInstanceLayerProperties failed!");
-
 		RAW_MEM_FREE(*available_layers);
-
 		return false;
 	}
 
@@ -85,7 +80,6 @@ bool rawGetAvailableVulkanInstanceExtensions(
 
 	if (result != VK_SUCCESS) {
 		RAW_LOG_ERROR("vkEnumerateInstanceExtensionProperties failed!");
-
 		return false;
 	}
 
@@ -96,8 +90,6 @@ bool rawGetAvailableVulkanInstanceExtensions(
 		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on "
 			"rawGetAvailableVulkanInstanceExtensions!");
 
-		RAW_MEM_FREE(*available_extensions);
-
 		return false;
 	}
 
@@ -106,9 +98,7 @@ bool rawGetAvailableVulkanInstanceExtensions(
 
 	if (result != VK_SUCCESS) {
 		RAW_LOG_ERROR("vkEnumerateInstanceExtensionProperties failed!");
-
 		RAW_MEM_FREE(*available_extensions);
-
 		return false;
 	}
 
@@ -143,7 +133,6 @@ bool rawCreateVulkanInstance(
 
 		if (!available) {
 			RAW_LOG_ERROR("%s is not available!", desired_layers[i]);
-
 			return false;
 		}
 	}
@@ -162,7 +151,6 @@ bool rawCreateVulkanInstance(
 
 		if (!available) {
 			RAW_LOG_ERROR("%s is not supported!", desired_extensions[i]);
-
 			return false;
 		}
 	}
@@ -198,7 +186,6 @@ bool rawCreateVulkanInstance(
 
 	if ((result != VK_SUCCESS) || (*instance == VK_NULL_HANDLE)) {
 		RAW_LOG_ERROR("Vulkan instance creation failed!");
-
 		return false;
 	}
 

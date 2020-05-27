@@ -179,6 +179,8 @@ bool rawGetVulkanPhysicalDeviceQueueFamilyIndex(
 	return false;
 }
 
+// TODO: Improve queue selection
+// (check when its better to have one or multiple queues)
 bool rawSelectVulkanPhysicalDeviceWithDesiredCharacteristics(
 	VkPhysicalDevice const* const physical_devices,
 	uint32_t n_physical_devices,
