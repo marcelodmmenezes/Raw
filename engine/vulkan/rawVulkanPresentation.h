@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 08/04/2020
- * Last modified: 26/05/2020
+ * Last modified: 27/05/2020
  */
 
 #ifndef RAW_VULKAN_PRESENTATION_H
@@ -80,16 +80,33 @@ bool rawGetAvailableVulkanPresentModes(
  *                        otherwise the swapchain dimensions will be determined
  *                        by the surface capabilities, and the values will be
  *                        stored on the parameters
+ *
+ * If successful, this function will allocate memory for:
+ *     @*swapchain_images
+ *
+ * It's the caller's responsibility to free that
+ * memory through a call to RAW_MEM_FREE
+ *
+ * The swapchain image format is fixed for now
+ * TODO: make swapchain image format dynamic
  */
 bool rawCreateSwapChain(
 	VkPhysicalDevice physical_device,
+	VkDevice logical_device,
 	VkSurfaceKHR presentation_surface,
 	VkPresentModeKHR desired_present_mode,
 	VkImageUsageFlags desired_image_usage,
 	VkSurfaceTransformFlagBitsKHR desired_transformation,
-	uint32_t* n_swapchain_images,
 	uint32_t* swapchain_width,
-	uint32_t* swapchain_height);
+	uint32_t* swapchain_height,
+	VkSwapchainKHR* previous_swapchain,
+	VkSwapchainKHR* current_swapchain,
+	VkImage** swapchain_images,
+	uint32_t* n_swapchain_images);
+
+void rawDestroyVulkanSwapchain(
+	VkDevice logical_device,
+	VkSwapchainKHR* swapchain);
 
 void rawDestroyVulkanPresentationSurface(
 	VkInstance instance,

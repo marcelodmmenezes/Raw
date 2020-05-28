@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 08/04/2020
- * Last modified: 26/05/2020
+ * Last modified: 27/05/2020
  */
 
 #include <engine/vulkan/rawVulkanPresentation.h>
@@ -100,13 +100,17 @@ bool rawGetAvailableVulkanPresentModes(
 
 bool rawCreateSwapChain(
 	VkPhysicalDevice physical_device,
+	VkDevice logical_device,
 	VkSurfaceKHR presentation_surface,
 	VkPresentModeKHR desired_present_mode,
 	VkImageUsageFlags desired_image_usage,
 	VkSurfaceTransformFlagBitsKHR desired_transformation,
-	uint32_t* n_swapchain_images,
 	uint32_t* swapchain_width,
-	uint32_t* swapchain_height) {
+	uint32_t* swapchain_height,
+	VkSwapchainKHR* previous_swapchain,
+	VkSwapchainKHR* current_swapchain,
+	VkImage** swapchain_images,
+	uint32_t* n_swapchain_images) {
 
 	VkPresentModeKHR* available_present_modes;
 	uint32_t n_available_present_modes;
@@ -164,45 +168,171 @@ bool rawCreateSwapChain(
 		(*n_swapchain_images > surface_capabilities.maxImageCount))
 		*n_swapchain_images = surface_capabilities.maxImageCount;
 
-	VkExtent2D swapchain_size;
+	VkExtent2D image_size;
 
 	if (surface_capabilities.currentExtent.width == 0xFFFFFFFF) {
 		if (!swapchain_width)
 			*swapchain_width = 1024u;
 
-		swapchain_size.width = *swapchain_width;
+		image_size.width = *swapchain_width;
 
 		if (!swapchain_height)
 			*swapchain_height = 768u;
 
-		swapchain_size.height = *swapchain_height;
+		image_size.height = *swapchain_height;
 
 		/// Clamping the dimensions
-		if (swapchain_size.width <
+		if (image_size.width <
 			surface_capabilities.minImageExtent.width)
-			swapchain_size.width =
+			image_size.width =
 				surface_capabilities.minImageExtent.width;
-		else if (swapchain_size.width >
+		else if (image_size.width >
 			surface_capabilities.minImageExtent.width)
-			swapchain_size.width =
+			image_size.width =
 				surface_capabilities.minImageExtent.width;
 
-		if (swapchain_size.height <
+		if (image_size.height <
 			surface_capabilities.minImageExtent.height)
-			swapchain_size.height =
+			image_size.height =
 				surface_capabilities.minImageExtent.height;
-		else if (swapchain_size.height >
+		else if (image_size.height >
 			surface_capabilities.minImageExtent.height)
-			swapchain_size.height =
+			image_size.height =
 				surface_capabilities.minImageExtent.height;
 	}
 	else {
-		swapchain_size = surface_capabilities.currentExtent;
-		*swapchain_width = swapchain_size.width;
-		*swapchain_height = swapchain_size.height;
+		image_size = surface_capabilities.currentExtent;
+		*swapchain_width = image_size.width;
+		*swapchain_height = image_size.height;
+	}
+
+	uint32_t n_formats;
+
+	result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device,
+		presentation_surface, &n_formats, RAW_NULL_PTR);
+
+	if ((result != VK_SUCCESS) || (n_formats == 0u)) {
+		RAW_LOG_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR failed!");
+		return false;
+	}
+
+	VkSurfaceFormatKHR* surface_formats;
+
+	RAW_MEM_ALLOC(surface_formats,
+		(uint64_t)n_formats, sizeof(VkSurfaceFormatKHR));
+
+	if (!surface_formats) {
+		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on rawCreateSwapchain");
+		return false;
+	}
+
+	result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device,
+		presentation_surface, &n_formats, surface_formats);
+
+	if ((result != VK_SUCCESS) || (n_formats == 0u)) {
+		RAW_LOG_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR failed!");
+		RAW_MEM_FREE(surface_formats);
+		return false;
+	}
+
+	// TODO: make generic choice
+	int32_t surface_format_id = -1;
+
+	for (uint32_t i = 0; i < n_formats; ++i) {
+		if (surface_formats[i].format == VK_FORMAT_B8G8R8A8_SRGB &&
+			surface_formats[i].colorSpace ==
+				VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+			surface_format_id = (int32_t)i;
+			break;
+		}
+	}
+
+	if (surface_format_id == -1) {
+		RAW_LOG_ERROR("The required surface format is not present!");
+		RAW_MEM_FREE(surface_formats);
+		return false;
+	}
+
+	VkSwapchainCreateInfoKHR swapchain_create_info = {
+		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+		.pNext = RAW_NULL_PTR,
+		.flags = 0,
+		.surface = presentation_surface,
+		.minImageCount = *n_swapchain_images,
+		.imageFormat = surface_formats[surface_format_id].format,
+		.imageColorSpace = surface_formats[surface_format_id].colorSpace,
+		.imageExtent = image_size,
+		.imageArrayLayers = 1,
+		.imageUsage = desired_image_usage,
+		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 0,
+		.pQueueFamilyIndices = RAW_NULL_PTR,
+		.preTransform = desired_transformation,
+		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+		.presentMode = desired_present_mode,
+		.clipped = VK_TRUE,
+		.oldSwapchain = *previous_swapchain
+	};
+
+	RAW_MEM_FREE(surface_formats);
+
+	// TODO: Pass allocation callback
+	result = vkCreateSwapchainKHR(logical_device,
+		&swapchain_create_info, RAW_NULL_PTR, current_swapchain);
+
+	if ((result != VK_SUCCESS) || (*current_swapchain == VK_NULL_HANDLE)) {
+		RAW_LOG_ERROR("Could not create swapchain!");
+		return false;
+	}
+
+	if (*previous_swapchain != VK_NULL_HANDLE) {
+		// TODO: Pass allocation callback
+		vkDestroySwapchainKHR(logical_device,
+			*previous_swapchain, RAW_NULL_PTR);
+		*previous_swapchain = VK_NULL_HANDLE;
+	}
+
+	// TODO: Pass allocation callback
+	result = vkGetSwapchainImagesKHR(logical_device,
+		*current_swapchain, n_swapchain_images, RAW_NULL_PTR);
+
+	if ((result != VK_SUCCESS) || (*n_swapchain_images == 0)) {
+		RAW_LOG_ERROR("vkGetSwapchainImagesKHR failed!");
+		return false;
+	}
+
+	RAW_MEM_ALLOC(*swapchain_images,
+		(uint64_t)*n_swapchain_images, sizeof(VkImage));
+
+	if (!*swapchain_images) {
+		RAW_LOG_ERROR("RAW_MEM_ALLOC failed on raw CreateSwapchain!");
+		return false;
+	}
+
+	result = vkGetSwapchainImagesKHR(logical_device,
+		*current_swapchain, n_swapchain_images, *swapchain_images);
+
+	if ((result != VK_SUCCESS) || (*n_swapchain_images == 0)) {
+		RAW_LOG_ERROR("vkGetSwapchainImagesKHR failed!");
+		RAW_MEM_FREE(*swapchain_images);
+		return false;
 	}
 
 	return true;
+}
+
+void rawDestroyVulkanSwapchain(
+	VkDevice logical_device,
+	VkSwapchainKHR* swapchain) {
+
+	if (swapchain) {
+		// TODO: Pass allocation callback
+		vkDestroySwapchainKHR(logical_device, *swapchain, RAW_NULL_PTR);
+		*swapchain = VK_NULL_HANDLE;
+	}
+	else
+		RAW_LOG_WARNING("Attempting to destroy "
+			"NULL Vulkan swapchain!");
 }
 
 void rawDestroyVulkanPresentationSurface(
