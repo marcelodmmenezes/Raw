@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 08/04/2020
- * Last modified: 27/05/2020
+ * Last modified: 16/06/2020
  */
 
 #include <engine/vulkan/rawVulkanPresentation.h>
@@ -89,7 +89,7 @@ bool rawGetAvailableVulkanPresentModes(
 		physical_device, presentation_surface,
 		n_present_modes, *present_modes);
 
-	if ((result == VK_SUCCESS) || (!*present_modes)) {
+	if ((result != VK_SUCCESS) || (!*present_modes)) {
 		RAW_LOG_ERROR("vkGetPhysicalDeviceSurfacePresentModesKHR failed!");
 		RAW_MEM_FREE(*present_modes);
 		return false;
@@ -98,7 +98,7 @@ bool rawGetAvailableVulkanPresentModes(
 	return true;
 }
 
-bool rawCreateSwapChain(
+bool rawCreateVulkanSwapchain(
 	VkPhysicalDevice physical_device,
 	VkDevice logical_device,
 	VkSurfaceKHR presentation_surface,
@@ -171,12 +171,12 @@ bool rawCreateSwapChain(
 	VkExtent2D image_size;
 
 	if (surface_capabilities.currentExtent.width == 0xFFFFFFFF) {
-		if (!swapchain_width)
+		if (*swapchain_width == 0u)
 			*swapchain_width = 1024u;
 
 		image_size.width = *swapchain_width;
 
-		if (!swapchain_height)
+		if (*swapchain_height == 0u)
 			*swapchain_height = 768u;
 
 		image_size.height = *swapchain_height;

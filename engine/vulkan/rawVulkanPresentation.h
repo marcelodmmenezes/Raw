@@ -28,7 +28,7 @@
  *
  * Marcelo de Matos Menezes - marcelodmmenezes@gmail.com
  * Created: 08/04/2020
- * Last modified: 27/05/2020
+ * Last modified: 16/06/2020
  */
 
 #ifndef RAW_VULKAN_PRESENTATION_H
@@ -70,10 +70,10 @@ bool rawGetAvailableVulkanPresentModes(
  *                        allocated swapchain images
  *     @*swapchain_width:
  *     @*swapchain_height:
- *                        if not null and the surface capabilities
+ *                        if not 0 and the surface capabilities
  *                        extent is 0xFFFFFFFF, its values will
  *                        determine the dimensions of the swapchain.
- *                        if null and the surface capabilities
+ *                        if 0 and the surface capabilities
  *                        extent height is 0xFFFFFFF, the swapchain dimensions
  *                        will have the default value of 1024 x 768, and
  *                        these values will be stored on the parameters
@@ -90,7 +90,7 @@ bool rawGetAvailableVulkanPresentModes(
  * The swapchain image format is fixed for now
  * TODO: make swapchain image format dynamic
  */
-bool rawCreateSwapChain(
+bool rawCreateVulkanSwapchain(
 	VkPhysicalDevice physical_device,
 	VkDevice logical_device,
 	VkSurfaceKHR presentation_surface,
